@@ -9,7 +9,5 @@ argon2-cffi                # Password hashing library, an alternative to bcrypt,
 alembic                    # Database migration tool for SQLAlchemy, useful for managing database schema changes
 uvloop                     # High-performance event loop for asyncio, only on Unix-based systems, can improve performance of FastAPI applications
 websockets                 # WebSocket support
-# celery                   # Uncomment if you need Celery for background tasks
-# celery-types             # Uncomment if you need type hints for Celery
-redis[asyncio,hiredis]     # Uncomment if you need Redis support for Celery or caching
+redis[asyncio,hiredis]     # Redis client with support for asyncio and the hiredis parser, useful for caching and message brokering
 alembic-postgresql-enum    # Optional dependency for Alembic to support PostgreSQL ENUM types
