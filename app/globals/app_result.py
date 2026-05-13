@@ -1,13 +1,15 @@
 from abc import ABC
 from typing import TypeVar, Generic, Optional
 
-from pydantic.v1.generics import GenericModel
+from pydantic import BaseModel
 
 # Définition d'une variable de type (TypeVar)
 # 'T' représentera le type de la donnée en cas de succès
 T = TypeVar("T")
+U = TypeVar("U")
 
-class GlobalAppResult(GenericModel, Generic[T], ABC):
+
+class GenericAppResult(BaseModel, Generic[T, U], ABC):
     """
     Classe Générique + Abstraite pour typer les réponses d'opérations dans tout le systeme.
 
@@ -15,8 +17,8 @@ class GlobalAppResult(GenericModel, Generic[T], ABC):
     """
 
     _ok: bool
-    _data: Optional[T]
-    _error: Optional[str]
+    _data: Optional[T] = None
+    _error: Optional[U] = None
 
     def is_success(self) -> bool:
         """
@@ -50,7 +52,7 @@ class GlobalAppResult(GenericModel, Generic[T], ABC):
         return self._data
 
     @property
-    def error(self) -> str:
+    def error(self) -> U:
         """
         Retourne le message d'erreur. Lève une exception si c'est un succès.
         Returns:
