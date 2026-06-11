@@ -1,0 +1,3 @@
+class ServicesNames:
+    USER_SERVICE = "USER_SERVICE"
+    UNKNOWN_SERVICE = "UNKNOWN_SERVICE"

@@ -1,24 +1,48 @@
-from abc import ABC
-from typing import TypeVar, Generic, Optional
-
-from pydantic import BaseModel
+from logging import getLogger, Logger
+from typing import TypeVar, Generic, Any
 
 # Définition d'une variable de type (TypeVar)
 # 'T' représentera le type de la donnée en cas de succès
+# 'U' représentera le type de l'erreur en cas d'échec
 T = TypeVar("T")
 U = TypeVar("U")
 
+logger: Logger = getLogger(__name__)
 
-class GenericAppResult(BaseModel, Generic[T, U], ABC):
+MISSING = object()
+
+
+class GenericAppResult(Generic[T, U]):
     """
-    Classe Générique + Abstraite pour typer les réponses d'opérations dans tout le systeme.
+    Classe Générique pour typer les réponses d'opérations dans tout le systeme.
 
     Elle encapsule soit une donnée de succès (data), soit un message d'erreur (error).
     """
 
-    _ok: bool
-    _data: Optional[T] = None
-    _error: Optional[U] = None
+    __slots__ = ("_ok", "_data", "_error")
+
+    def __init__(self, ok: bool, data: Any = MISSING, error: Any = MISSING):
+        """
+        Initialise une instance de GenericAppResult. Valide les arguments pour assurer la cohérence des données.
+        NE PAS UTILISER DIRECTEMENT, UTILISER LES FONCTIONS DE CLASSE success() et failure() POUR CRÉER DES INSTANCES.
+        Args:
+            ok: bool: Indique si la réponse est un succès (True) ou une erreur (False).
+            data: T | object: Les données de succès, requis si ok est True. Ignoré si ok est False.
+            error: U | object: Le message d'erreur, requis si ok est False. Ignoré si ok est True.
+        """
+        if ok and data is MISSING:
+            raise ValueError(
+                "Une réponse de succès doit contenir des données."
+            )
+
+        if not ok and error is MISSING:
+            raise ValueError(
+                "Une réponse d'erreur doit contenir un message d'erreur."
+            )
+
+        self._ok: bool = ok
+        self._data: T | object = data
+        self._error: U | object = error
 
     def is_success(self) -> bool:
         """
@@ -49,7 +73,7 @@ class GenericAppResult(BaseModel, Generic[T, U], ABC):
             raise RuntimeError(
                 "Tentative d'accéder aux données sur une réponse d'erreur."
             )
-        return self._data
+        return self._data  # type: ignore
 
     @property
     def error(self) -> U:
@@ -60,8 +84,35 @@ class GenericAppResult(BaseModel, Generic[T, U], ABC):
         Raises:
             RuntimeError: Si la réponse est un succès et que l'on tente d'accéder à l'erreur
         """
-        if not self._error:
+        if not self.is_error():
             raise RuntimeError(
                 "Tentative d'accéder à l'erreur sur une réponse de succès."
             )
-        return self._error
+        return self._error  # type: ignore
+
+    @classmethod
+    def failure(cls, error: U) -> "GenericAppResult[T, U]":
+        """
+        Crée une réponse d'erreur avec le message d'erreur fourni.
+        Args:
+            error (U) : Le message d'erreur à inclure dans la réponse.
+        Returns:
+            GenericAppResult[T, U] : Une instance de GenericAppResult représentant une erreur.
+        """
+        return cls(ok=False, error=error)
+
+    @classmethod
+    def success(cls, data: T) -> "GenericAppResult[T, U]":
+        """
+        Crée une réponse de succès avec les données fournies.
+        Args:
+            data (T) : Les données à inclure dans la réponse de succès.
+        Returns:
+            GenericAppResult[T, U] : Une instance de GenericAppResult représentant un succès.
+        """
+        return cls(ok=True, data=data)
+
+    def __repr__(self) -> str:
+        if self.is_success():
+            return f"GenericAppResult(Status=SUCCESS, Data={self._data})"
+        return f"GenericAppResult(Status=FAILURE, Error={self._error})"
