@@ -9,13 +9,27 @@ T = TypeVar("T")
 
 class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
     """
-    Classe générique pour typer les réponses d'opérations CRUD dans les Repository.
-
-    Elle encapsule soit une donnée de succès (data), soit un message d'erreur (error).
+    Classe générique pour typer les réponses d'opérations des Services Intégrés.
     """
 
-    def __init__(self, ok: bool, service_name: str, status_code: int, data: Optional[T] = None,
-                 error: Optional[AppError] = None):
+    def __init__(
+        self,
+        ok: bool,
+        service_name: str,
+        status_code: int,
+        data: Optional[T] = None,
+        error: Optional[AppError] = None,
+    ):
+        """
+        Initialise une instance de IntegrationServiceResult.
+        UTILISER LES FONCTIONS D'AIDE (Helpers) POUR CRÉER DES INSTANCES DE CETTE CLASSE.
+        Args:
+            ok: Indique si l'opération a réussi ou échoué.
+            service_name: Le nom du service qui génère cette réponse.
+            status_code: Le code de statut HTTP associé à la réponse.
+            data: Les données de succès à encapsuler dans la réponse (optionnel, utilisé uniquement si ok=True).
+            error: L'objet d'erreur à encapsuler dans la réponse (optionnel, utilisé uniquement si ok=False).
+        """
         super().__init__(ok=ok, data=data, error=error)
         self._service_name: str = service_name
         self._status_code: int = status_code
@@ -38,13 +52,25 @@ class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
     # --- Fonctions d'aide (Helpers) ---
 
     @classmethod
-    def integration_service_succes(cls, data: T, status_code: int = 200,
-                                   service_name: str = ServicesNames.UNKNOWN_SERVICE) -> "IntegrationServiceResult[T]":
+    def integration_service_success(
+        cls,
+        data: T,
+        status_code: int = 200,
+        service_name: str = ServicesNames.UNKNOWN_SERVICE,
+    ) -> "IntegrationServiceResult[T]":
         """Crée une réponse de succès avec les données fournies."""
-        return cls(ok=True, data=data, status_code=status_code, service_name=service_name)
+        return cls(
+            ok=True, data=data, status_code=status_code, service_name=service_name
+        )
 
     @classmethod
-    def crud_error(cls, error: AppError, status_code: int = 500,
-                   service_name: str = ServicesNames.UNKNOWN_SERVICE) -> "IntegrationServiceResult[T]":
+    def integration_service_failure(
+        cls,
+        error: AppError,
+        status_code: int = 500,
+        service_name: str = ServicesNames.UNKNOWN_SERVICE,
+    ) -> "IntegrationServiceResult[T]":
         """Crée une réponse d'erreur avec l'objet d'erreur fourni."""
-        return cls(ok=False, error=error, status_code=status_code, service_name=service_name)
+        return cls(
+            ok=False, error=error, status_code=status_code, service_name=service_name
+        )

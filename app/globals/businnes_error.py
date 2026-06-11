@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class AppErrorType(str, Enum):
@@ -8,8 +8,19 @@ class AppErrorType(str, Enum):
     NOT_FOUND = "NOT_FOUND"
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
 
+
 class AppError(BaseModel):
     """Modèle de données pour représenter une erreur métier."""
-    type: AppErrorType
-    error_message: str
 
+    error_type: AppErrorType = Field(
+        default=None,
+        title="Type d'erreur métier",
+        description="Le type d'erreur métier qui s'est produite, utilisé pour catégoriser les"
+        " erreurs et faciliter la gestion des erreurs dans coté frontend",
+    )
+
+    error_message: str = Field(
+        title="Champ des erreurs affichable directement à l'utilisateur (Texte User friendly)",
+        description="Présent seulement si la requete à échouée ou si quelque chose s'est mal pa"
+        "ssé durant le traitement",
+    )

@@ -1,14 +1,11 @@
+class CacheDuration:
+    """Classe pour définir la durée(en S) des données en cache"""
 
-from enum import Enum as enum
-
-class CacheDurartion(int, enum):
-  """Classe  enumérartion pour définir la durée(en S) des données en cache"""
-
-  USER_DURATION = 1500 # 25 min
-  SESSION_DURATION = 1020 # 20 min
-  UPLOAD_INTENT_DURATION = 60 * 60 # 1 heure
-  UPLOAD_PROGRESS_STREAM_DURATION = 60 * 60 * 2 # Deux heures, je supposes que le traitement ne deppassera pas 2h
-  EVENT_DURATION = 1500
-  CLUB_MEMBER_DURATION = 1500
-  OTP_DURATION = 1500 # 25 min pour les tests. ca va eviter de checker chaque fois le mail. on change aprés 
-  AVATAR_UPLOAD_URL = 1000
+    ONE_DAY = 60 * 60 * 24  # 24 heures
+    ONE_HOUR = 60 * 60  # 1 heure
+    THIRTY_MINUTES = 60 * 30  # 30 minutes
+    FIFTEEN_MINUTES = 60 * 15  # 15 minutes
+    TEN_MINUTES = 60 * 10  # 10 minutes
+    FIVE_MINUTES = 60 * 5  # 5 minutes
+    ONE_MINUTE = 60  # 1 minute
+    THIRTY_SECONDS = 30  # 30 secondes

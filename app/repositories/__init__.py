@@ -5,6 +5,7 @@ from app.globals.businnes_error import AppError
 
 T = TypeVar("T")
 
+
 class CrudResult(GenericAppResult[T, AppError], Generic[T]):
     """
     Classe générique pour typer les réponses d'opérations CRUD dans les Repository.
@@ -12,8 +13,13 @@ class CrudResult(GenericAppResult[T, AppError], Generic[T]):
     Elle encapsule soit une donnée de succès (data), soit un message d'erreur (error).
     """
 
-
-    def __init__(self, ok: bool, status_code: int, data: Optional[T] = None, error: Optional[AppError] = None):
+    def __init__(
+        self,
+        ok: bool,
+        status_code: int,
+        data: Optional[T] = None,
+        error: Optional[AppError] = None,
+    ):
         super().__init__(ok=ok, data=data, error=error)
         self._status_code: int = status_code
 
@@ -24,6 +30,10 @@ class CrudResult(GenericAppResult[T, AppError], Generic[T]):
             return f"<CRUDResponse Status {self._status_code} Success: {self._data!r}>"
         return f"<CRUDResponse Status {self._status_code} Error: {self._error!r}>"
 
+    @property
+    def status_code(self) -> int:
+        return self._status_code
+
     # --- Fonctions d'aide (Helpers) ---
 
     @classmethod
@@ -32,10 +42,6 @@ class CrudResult(GenericAppResult[T, AppError], Generic[T]):
         return cls(ok=True, data=data, status_code=status_code)
 
     @classmethod
-    def crud_error(cls, error: AppError, status_code: int = 500) -> "CrudResult[T]":
+    def crud_failure(cls, error: AppError, status_code: int = 500) -> "CrudResult[T]":
         """Crée une réponse d'erreur avec l'objet d'erreur fourni."""
         return cls(ok=False, error=error, status_code=status_code)
-
-    @property
-    def status_code(self) -> int:
-        return self._status_code
