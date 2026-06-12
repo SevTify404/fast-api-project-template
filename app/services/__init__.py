@@ -1,14 +1,10 @@
 from typing import Generic, Optional, Any
-from typing_extensions import TypeVar
+from fastapi import Response
 
-from app.globals.app_result import GenericAppResult
+from app.globals.app_result import GenericAppResult, T, U
 from app.globals.businnes_error import AppError
 from app.globals.services_names import ServicesNames
-from fastapi import Response
 from app.schemas.globals.api_base_response import ApiBaseResponse
-
-T = TypeVar("T")
-U = TypeVar("U", default=AppError)
 
 
 class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
@@ -64,7 +60,7 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
         """
         if self.is_error():
             return ApiBaseResponse[Any, Any].error_response(
-                error_message=self._error,  # type: ignore
+                error_message=self._error,
                 response=reponse,
                 status_code=self.status_code,
             )
@@ -92,6 +88,7 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
         Returns:
             L'instance de ServiceResult contenant les données de succès.
         """
+        # pyrefly: ignore [bad-return]
         return cls(
             ok=True, data=data, status_code=status_code, service_name=service_name
         )
@@ -113,6 +110,10 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
         Returns:
             L'instance de ServiceResult contenant le message d'erreur.
         """
+        # pyrefly: ignore [bad-return]
         return cls(
             ok=False, error=error, status_code=status_code, service_name=service_name
         )
+
+
+DefaultAppServiceResult = ServiceResult[T, AppError]

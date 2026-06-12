@@ -1,12 +1,8 @@
-from typing import Generic, Optional
-from typing_extensions import TypeVar
+from typing import Generic, Optional, TypeAlias
 
-from app.globals.app_result import GenericAppResult
+from app.globals.app_result import GenericAppResult, T, U
 from app.globals.businnes_error import AppError
 from app.globals.services_names import ServicesNames
-
-T = TypeVar("T")
-U = TypeVar("U", default=AppError)
 
 
 class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
@@ -61,6 +57,7 @@ class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
     ) -> "IntegrationServiceResult[T, U]":
         """Crée une réponse de succès avec les données fournies."""
+        # pyrefly: ignore [bad-return]
         return cls(
             ok=True, data=data, status_code=status_code, service_name=service_name
         )
@@ -73,6 +70,10 @@ class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
     ) -> "IntegrationServiceResult[T, U]":
         """Crée une réponse d'erreur avec l'objet d'erreur fourni."""
+        # pyrefly: ignore [bad-return]
         return cls(
             ok=False, error=error, status_code=status_code, service_name=service_name
         )
+
+
+AppIntegrationServiceResult: TypeAlias = IntegrationServiceResult[T, AppError]

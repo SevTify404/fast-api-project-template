@@ -1,15 +1,21 @@
 from logging import getLogger, Logger
-from typing import TypeVar, Generic, Any
+from typing import Generic, Any
+from typing_extensions import TypeVar
 
-# Définition d'une variable de type (TypeVar)
-# 'T' représentera le type de la donnée en cas de succès
-# 'U' représentera le type de l'erreur en cas d'échec
-T = TypeVar("T")
-U = TypeVar("U")
+from app.globals.businnes_error import AppError
 
 logger: Logger = getLogger(__name__)
 
 MISSING = object()
+
+
+# Définition d'une variable de type (TypeVar)
+# 'T' représentera le type de la donnée en cas de succès
+# 'U' représentera le type de l'erreur en cas d'échec
+# IMPORTANT: Aucune contrainte pour permettre la modularité maximale
+# (tout type d'erreur personnalisé fonctionne, pas seulement AppError)
+T = TypeVar("T")
+U = TypeVar("U", default=AppError)
 
 
 class GenericAppResult(Generic[T, U]):
@@ -31,14 +37,10 @@ class GenericAppResult(Generic[T, U]):
             error: U | object: Le message d'erreur, requis si ok est False. Ignoré si ok est True.
         """
         if ok and data is MISSING:
-            raise ValueError(
-                "Une réponse de succès doit contenir des données."
-            )
+            raise ValueError("Une réponse de succès doit contenir des données.")
 
         if not ok and error is MISSING:
-            raise ValueError(
-                "Une réponse d'erreur doit contenir un message d'erreur."
-            )
+            raise ValueError("Une réponse d'erreur doit contenir un message d'erreur.")
 
         self._ok: bool = ok
         self._data: T | object = data
@@ -99,6 +101,7 @@ class GenericAppResult(Generic[T, U]):
         Returns:
             GenericAppResult[T, U] : Une instance de GenericAppResult représentant une erreur.
         """
+        # pyrefly: ignore [bad-return]
         return cls(ok=False, error=error)
 
     @classmethod
@@ -110,6 +113,7 @@ class GenericAppResult(Generic[T, U]):
         Returns:
             GenericAppResult[T, U] : Une instance de GenericAppResult représentant un succès.
         """
+        # pyrefly: ignore [bad-return]
         return cls(ok=True, data=data)
 
     def __repr__(self) -> str:

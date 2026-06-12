@@ -50,10 +50,12 @@ def get_real_ip(request: Request) -> str:
     # 1. On regarde d'abord le header X-Forwarded-For (injecté par le proxy)
     x_forwarded_for = request.headers.get("X-Forwarded-For")
     if x_forwarded_for:
+        # pyrefly: ignore [unnecessary-type-conversion]
         return str(x_forwarded_for.split(",")[0].strip())
 
     # 2. Sinon, on utilise request.client
     if request.client:
+        # pyrefly: ignore [unnecessary-type-conversion]
         return str(request.client.host)
 
     # 3. Fallback si rien n'est trouvé

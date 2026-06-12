@@ -231,6 +231,7 @@ class CacheWrapper:
             La valeur associée à la clé de cache si elle existe, sinon None
         """
 
+        # pyrefly: ignore [bad-return]
         return await self._connection.get(self._format_cache_key(key))
 
     async def get_pydantic_model_from_cache(
@@ -466,6 +467,7 @@ class CacheWrapper:
         # Redis attend des strings/bytes pour les champs du stream. On sécurise ça.
         serialized_fields = {str(k): self._serialize(v) for k, v in fields.items()}
 
+        # pyrefly: ignore [no-matching-overload]
         return await self._connection.xadd(
             self._format_cache_key(key),
             serialized_fields,
@@ -496,6 +498,7 @@ class CacheWrapper:
             {stream_name: last_id}, count=count, block=block
         )
 
+        # pyrefly: ignore [bad-argument-type]
         return self._extract_and_decode_stream_messages(stream_res)
 
     async def stream_create_group(
@@ -541,6 +544,7 @@ class CacheWrapper:
         """
         stream_name = self._format_cache_key(key)
         # Le caractère '>' signifie : "donne moi les messages jamais assignés à un consommateur du groupe"
+        # pyrefly: ignore [bad-return]
         return await self._connection.xreadgroup(
             group_name, consumer_name, {stream_name: ">"}, count=count, block=block
         )
@@ -576,6 +580,7 @@ class CacheWrapper:
         if not values:
             return 0
 
+        # pyrefly: ignore [no-matching-overload]
         return await self._connection.sadd(self._format_cache_key(key), *values)
 
     async def get_from_a_set(self, key: CacheKey) -> set[Any]:
@@ -618,6 +623,7 @@ class CacheManager:
 
     _instance = None
 
+    # pyrefly: ignore [bad-assignment]
     _redis_client: Redis = None
 
     def __new__(cls):

@@ -7,13 +7,13 @@ class AppErrorType(str, Enum):
     LOCKED_CONTENT = "LOCKED_CONTENT"
     NOT_FOUND = "NOT_FOUND"
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
+    BAD_REQUEST = "BAD_REQUEST"
 
 
 class AppError(BaseModel):
     """Modèle de données pour représenter une erreur métier."""
 
     error_type: AppErrorType = Field(
-        default=None,
         title="Type d'erreur métier",
         description="Le type d'erreur métier qui s'est produite, utilisé pour catégoriser les"
         " erreurs et faciliter la gestion des erreurs dans coté frontend",

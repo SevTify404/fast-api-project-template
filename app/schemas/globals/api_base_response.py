@@ -1,16 +1,13 @@
-from typing import Generic, Optional
-from typing_extensions import TypeVar
+from typing import Generic, Optional, TypeAlias
 from fastapi import Response
 from pydantic import BaseModel, Field, model_validator
 
+from app.globals.app_result import T, U
 from app.globals.businnes_error import AppError
-
-T = TypeVar("T")
-E = TypeVar("E", default=AppError)
 
 
 # Modele de base pour toutes les reponses de l'API
-class ApiBaseResponse(BaseModel, Generic[T, E]):
+class ApiBaseResponse(BaseModel, Generic[T, U]):
     """Scema de base pour uniformiser les réponses de l'API"""
 
     ok: bool = Field(
@@ -24,7 +21,7 @@ class ApiBaseResponse(BaseModel, Generic[T, E]):
         description="Présent seulement si la requet à réussi",
     )
 
-    error: Optional[E] = Field(
+    error: Optional[U] = Field(
         default=None,
         title="Champ des erreurs",
         description="Présent seulement si la requete à échouée ou si quelque chose s'est mal passé durant le traitement",
@@ -40,7 +37,9 @@ class ApiBaseResponse(BaseModel, Generic[T, E]):
 
     # Cette methode permettra de renvoyer les reponse de succèss directement depuis les classes filles
     @classmethod
-    def success_response(cls, data: T, response: Response, status_code: int = 200):
+    def success_response(
+        cls, data: T, response: Response, status_code: int = 200
+    ) -> "ApiBaseResponse[T, U]":
         """
         Methode pour instancier une reponse de succes
         Args:
@@ -53,13 +52,14 @@ class ApiBaseResponse(BaseModel, Generic[T, E]):
 
         response.status_code = status_code
 
+        # pyrefly: ignore [bad-return]
         return cls(ok=True, result=data, error=None)
 
     # Cette methode permettra de renvoyer les reponse d'erreur directement depuis les classes filles
     @classmethod
     def error_response(
-        cls, error_message: E, response: Response, status_code: int = 400
-    ):
+        cls, error_message: U, response: Response, status_code: int = 400
+    ) -> "ApiBaseResponse[T, U]":
         """
         Methode pour instancier une réponse d'échec
         Args:
@@ -71,4 +71,8 @@ class ApiBaseResponse(BaseModel, Generic[T, E]):
         """
         response.status_code = status_code
 
+        # pyrefly: ignore [bad-return]
         return cls(ok=False, result=None, error=error_message)
+
+
+DefaultAppApiResponse: TypeAlias = ApiBaseResponse[T, AppError]

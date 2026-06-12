@@ -1,13 +1,9 @@
-from typing import Generic, Optional, Any
-from typing_extensions import TypeVar
+from typing import Generic, Optional, Any, TypeAlias
 
-from app.globals.app_result import GenericAppResult
+from app.globals.app_result import GenericAppResult, T, U
 from app.globals.businnes_error import AppError
 from app.globals.services_names import ServicesNames
 from app.services import ServiceResult
-
-T = TypeVar("T")
-U = TypeVar("U", default=AppError)
 
 
 class CrudResult(GenericAppResult[T, U], Generic[T, U]):
@@ -43,17 +39,27 @@ class CrudResult(GenericAppResult[T, U], Generic[T, U]):
     @classmethod
     def crud_success(cls, data: T, status_code: int = 200) -> "CrudResult[T, U]":
         """Crée une réponse de succès avec les données fournies."""
+        # pyrefly: ignore [bad-return]
         return cls(ok=True, data=data, status_code=status_code)
 
     @classmethod
     def crud_failure(cls, error: U, status_code: int = 500) -> "CrudResult[T, U]":
         """Crée une réponse d'erreur avec l'objet d'erreur fourni."""
+        # pyrefly: ignore [bad-return]
         return cls(ok=False, error=error, status_code=status_code)
 
     def to_service_error(
         self, service_name: str = ServicesNames.UNKNOWN_SERVICE
-    ) -> ServiceResult[Any, U]:
+    ) -> "ServiceResult[Any, U]":
         """Convertit ce CRUDResult en un ServiceResult d'erreur, en conservant le message et le status code."""
-        return ServiceResult.service_failure(
-            error=self.error, status_code=self.status_code, service_name=service_name
+        result = ServiceResult.service_failure(
+            # pyrefly: ignore [bad-argument-type]
+            error=self.error,
+            status_code=self.status_code,
+            service_name=service_name,
         )
+        # pyrefly: ignore [bad-return]
+        return result
+
+
+DefaultAppCrudResult: TypeAlias = CrudResult[T, AppError]

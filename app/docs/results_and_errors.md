@@ -19,14 +19,24 @@ Le système fournit trois classes spécialisées pour chaque couche de l'archite
 
 ## 2. Utilisation Standard (Erreurs par défaut : `AppError`)
 
-Dans la majorité des cas, l'erreur par défaut `AppError` est suffisante. Grâce aux types génériques avec valeur par défaut, vous n'avez pas besoin de spécifier le deuxième paramètre de type si vous utilisez `AppError`.
+Dans la majorité des cas, l'erreur par défaut `AppError` est suffisante. 
+
+Pour simplifier l'écriture et améliorer la lisibilité du code, des alias de types préconfigurés avec `AppError` sont mis à disposition :
+- **`DefaultAppCrudResult[T]`** est un alias de `CrudResult[T, AppError]`
+- **`DefaultAppServiceResult[T]`** est un alias de `ServiceResult[T, AppError]`
+- **`DefaultAppIntegrationServiceResult[T]`** est un alias de `IntegrationServiceResult[T, AppError]`
+- **`DefaultAppApiResponse[T]`** est un alias de `ApiBaseResponse[T, AppError]`
+
+Ces alias ne nécessitent qu'un seul paramètre générique (le type de donnée en cas de succès `T`).
 
 ### Exemple dans un Repository :
+
 ```python
-from app.repositories import CrudResult
+from app.repositories import DefaultAppCrudResult, CrudResult
 from app.schemas.users import UserResponse  # Modèle Pydantic
 
-def get_user_by_id(user_id: int) -> CrudResult[UserResponse]:
+
+def get_user_by_id(user_id: int) -> DefaultAppCrudResult[UserResponse]:
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         # L'erreur par défaut est AppError
@@ -35,25 +45,29 @@ def get_user_by_id(user_id: int) -> CrudResult[UserResponse]:
             error_message="L'utilisateur n'existe pas."
         )
         return CrudResult.crud_failure(error, status_code=404)
-        
+
     return CrudResult.crud_success(UserResponse.model_validate(user))
+
 ```
 
 ### Exemple dans un Service (Propagation et Conversion) :
+
 ```python
-from app.services import ServiceResult
+from app.services import DefaultAppServiceResult, ServiceResult
 from app.repositories import UserRepository
 
-def get_user_profile(user_id: int) -> ServiceResult[UserResponse]:
+
+def get_user_profile(user_id: int) -> DefaultAppServiceResult[UserResponse]:
     # Appel au repository
     repo_res = UserRepository.get_user_by_id(user_id)
-    
+
     if repo_res.is_error():
         # Conversion directe du CrudResult d'erreur en ServiceResult d'erreur.
         # Le type d'erreur (AppError) et le code de statut (404) sont conservés.
         return repo_res.to_service_error(service_name="UserService")
-        
+
     return ServiceResult.service_success(repo_res.data)
+
 ```
 
 ---
@@ -105,7 +119,7 @@ from app.schemas.globals.api_base_response import ApiBaseResponse
 
 router = APIRouter()
 
-@router.post("/pay")
+@router.post("/pay", response_model=ApiBaseResponse[PaymentResponse, PaymentErrorDetail])
 async def pay(response: Response) -> ApiBaseResponse[PaymentResponse, PaymentErrorDetail]:
     service_res = payment_service.process_payment(100.0)
     
@@ -130,11 +144,28 @@ class PaymentApiResponse(ApiBaseResponse[PaymentResponse, PaymentErrorDetail]):
 
 Puis dans votre routeur :
 ```python
-@router.post("/pay")
+@router.post("/pay", response_model=PaymentApiResponse)
 async def pay(response: Response) -> PaymentApiResponse:
     service_res = payment_service.process_payment(100.0)
     
     # Le retour est converti et validé proprement
+    return service_res.to_HTTP_api_base_response(response)
+```
+
+Pour les routes simples qui n'ont pas de schéma d'erreur personnalisé, il existe un alias de `ApiBaseResponse` 
+préconfiguré avec `AppError` : `DefaultAppApiResponse[T]`. Vous pouvez l'utiliser directement pour une documentation 
+Swagger propre sans devoir spécifier le type d'erreur à chaque fois.
+
+```python
+class ReadUserApiResponse(DefaultAppApiResponse[UserResponse]):
+    """Réponse standardisée pour les opérations utilisateur"""
+    # Pas besoin de redéclarer les champs, ils sont hérités et typés automatiquement !
+```
+Puis dans votre routeur :
+```python
+@router.get("/users/{user_id}", response_model=ReadUserApiResponse)
+async def read_user(user_id: int, response: Response) -> ReadUserApiResponse:
+    service_res = user_service.get_user_profile(user_id)
     return service_res.to_HTTP_api_base_response(response)
 ```
 
@@ -144,7 +175,7 @@ async def pay(response: Response) -> PaymentApiResponse:
 
 > [!TIP]
 > - **Utilisez toujours les helpers de classe** (`crud_success`, `service_failure`, etc.) au lieu d'instancier les classes directement via `__init__`.
-> - **Utilisez l'approche par sous-classage de `ApiBaseResponse`** pour toutes les routes publiques afin de garder votre documentation Swagger claire et professionnelle.
+> - **Utilisez l'approche par sous-classage de `ApiBaseResponse` ou `DefaultAppApiResponse`** pour toutes les routes publiques afin de garder votre documentation Swagger claire et professionnelle.
 
 > [!WARNING]
 > - **Ne pas court-circuiter le typage** en utilisant `Any` comme type d'erreur si vous connaissez la structure de l'erreur. Spécifier la structure permet au frontend d'avoir un typage rigoureux généré via OpenAPI.
