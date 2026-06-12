@@ -42,7 +42,7 @@ class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
         return f"<IntegrationServiceResult {self._service_name} Error: {self._error!r}>"
 
     @property
-    def service_name(self) -> str:
+    def integration_service_name(self) -> str:
         return self._service_name
 
     @property
