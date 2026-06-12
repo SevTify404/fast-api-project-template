@@ -6,14 +6,14 @@ Ce document explique le fonctionnement du système de retour standardisé de l'a
 
 ## 1. Principes de base
 
-Toutes les réponses internes de l'application héritent d'une classe de base générique : `GenericAppResult[T, U]`.
-- **`T`** représente le type de données retourné en cas de **succès** (ex: un modèle Pydantic, un type primitif, `None`, etc.).
-- **`U`** représente le type d'erreur retourné en cas d'**échec** (par défaut, `AppError`).
+Toutes les réponses internes de l'application héritent d'une classe de base générique : `GenericAppResult[D, E]`.
+- **`D`** représente le type de données retourné en cas de **succès** (ex: un modèle Pydantic, un type primitif, `None`, etc.).
+- **`E`** représente le type d'erreur retourné en cas d'**échec** (par défaut, `AppError`).
 
 Le système fournit trois classes spécialisées pour chaque couche de l'architecture :
-1. **`CrudResult[T, U]`** (couche Repository)
-2. **`ServiceResult[T, U]`** (couche Service)
-3. **`IntegrationServiceResult[T, U]`** (couche Services Externes/Intégrations)
+1. **`CrudResult[D, E]`** (couche Repository)
+2. **`ServiceResult[D, E]`** (couche Service)
+3. **`IntegrationServiceResult[D, E]`** (couche Services Externes/Intégrations)
 
 ---
 
@@ -22,12 +22,12 @@ Le système fournit trois classes spécialisées pour chaque couche de l'archite
 Dans la majorité des cas, l'erreur par défaut `AppError` est suffisante. 
 
 Pour simplifier l'écriture et améliorer la lisibilité du code, des alias de types préconfigurés avec `AppError` sont mis à disposition :
-- **`DefaultAppCrudResult[T]`** est un alias de `CrudResult[T, AppError]`
-- **`DefaultAppServiceResult[T]`** est un alias de `ServiceResult[T, AppError]`
-- **`DefaultAppIntegrationServiceResult[T]`** est un alias de `IntegrationServiceResult[T, AppError]`
-- **`DefaultAppApiResponse[T]`** est un alias de `ApiBaseResponse[T, AppError]`
+- **`DefaultAppCrudResult[D]`** est un alias de `CrudResult[D, AppError]`
+- **`DefaultAppServiceResult[D]`** est un alias de `ServiceResult[D, AppError]`
+- **`DefaultAppIntegrationServiceResult[D]`** est un alias de `IntegrationServiceResult[D, AppError]`
+- **`DefaultAppApiResponse[D]`** est un alias de `ApiBaseResponse[D, AppError]`
 
-Ces alias ne nécessitent qu'un seul paramètre générique (le type de donnée en cas de succès `T`).
+Ces alias ne nécessitent qu'un seul paramètre générique (le type de donnée en cas de succès `D`).
 
 ### Exemple dans un Repository :
 
@@ -153,7 +153,7 @@ async def pay(response: Response) -> PaymentApiResponse:
 ```
 
 Pour les routes simples qui n'ont pas de schéma d'erreur personnalisé, il existe un alias de `ApiBaseResponse` 
-préconfiguré avec `AppError` : `DefaultAppApiResponse[T]`. Vous pouvez l'utiliser directement pour une documentation 
+préconfiguré avec `AppError` : `DefaultAppApiResponse[D]`. Vous pouvez l'utiliser directement pour une documentation 
 Swagger propre sans devoir spécifier le type d'erreur à chaque fois.
 
 ```python

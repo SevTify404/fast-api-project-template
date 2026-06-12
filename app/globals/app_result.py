@@ -9,16 +9,16 @@ logger: Logger = getLogger(__name__)
 MISSING = object()
 
 
-# Définition d'une variable de type (TypeVar)
-# 'T' représentera le type de la donnée en cas de succès
-# 'U' représentera le type de l'erreur en cas d'échec
+# Définition des variables de type (TypeVar)
+# 'D' représentera le type de la donnée en cas de succès
+# 'E' représentera le type de l'erreur en cas d'échec
 # IMPORTANT: Aucune contrainte pour permettre la modularité maximale
 # (tout type d'erreur personnalisé fonctionne, pas seulement AppError)
-T = TypeVar("T")
-U = TypeVar("U", default=AppError)
+D = TypeVar("D")
+E = TypeVar("E", default=AppError)
 
 
-class GenericAppResult(Generic[T, U]):
+class GenericAppResult(Generic[D, E]):
     """
     Classe Générique pour typer les réponses d'opérations dans tout le systeme.
 
@@ -33,8 +33,8 @@ class GenericAppResult(Generic[T, U]):
         NE PAS UTILISER DIRECTEMENT, UTILISER LES FONCTIONS DE CLASSE success() et failure() POUR CRÉER DES INSTANCES.
         Args:
             ok: bool: Indique si la réponse est un succès (True) ou une erreur (False).
-            data: T | object: Les données de succès, requis si ok est True. Ignoré si ok est False.
-            error: U | object: Le message d'erreur, requis si ok est False. Ignoré si ok est True.
+            data: D | object: Les données de succès, requis si ok est True. Ignoré si ok est False.
+            error: E | object: Le message d'erreur, requis si ok est False. Ignoré si ok est True.
         """
         if ok and data is MISSING:
             raise ValueError("Une réponse de succès doit contenir des données.")
@@ -43,8 +43,8 @@ class GenericAppResult(Generic[T, U]):
             raise ValueError("Une réponse d'erreur doit contenir un message d'erreur.")
 
         self._ok: bool = ok
-        self._data: T | object = data
-        self._error: U | object = error
+        self._data: D | object = data
+        self._error: E | object = error
 
     def is_success(self) -> bool:
         """
@@ -63,11 +63,11 @@ class GenericAppResult(Generic[T, U]):
         return not self._ok
 
     @property
-    def data(self) -> T:
+    def data(self) -> D:
         """
         Retourne les données de succès. Lève une exception si c'est une erreur.
         Returns:
-            T: Les données de succès.
+            D: Les données de succès.
         Raises:
             RuntimeError: Si la réponse est une erreur et que l'on tente d'accéder aux données.
         """
@@ -78,11 +78,11 @@ class GenericAppResult(Generic[T, U]):
         return self._data  # type: ignore
 
     @property
-    def error(self) -> U:
+    def error(self) -> E:
         """
         Retourne le message d'erreur. Lève une exception si c'est un succès.
         Returns:
-            str: Le message d'erreur.
+            E: Le message d'erreur.
         Raises:
             RuntimeError: Si la réponse est un succès et que l'on tente d'accéder à l'erreur
         """
@@ -93,25 +93,25 @@ class GenericAppResult(Generic[T, U]):
         return self._error  # type: ignore
 
     @classmethod
-    def failure(cls, error: U) -> "GenericAppResult[T, U]":
+    def failure(cls, error: E) -> "GenericAppResult[D, E]":
         """
         Crée une réponse d'erreur avec le message d'erreur fourni.
         Args:
-            error (U) : Le message d'erreur à inclure dans la réponse.
+            error (E) : Le message d'erreur à inclure dans la réponse.
         Returns:
-            GenericAppResult[T, U] : Une instance de GenericAppResult représentant une erreur.
+            GenericAppResult[D, E] : Une instance de GenericAppResult représentant une erreur.
         """
         # pyrefly: ignore [bad-return]
         return cls(ok=False, error=error)
 
     @classmethod
-    def success(cls, data: T) -> "GenericAppResult[T, U]":
+    def success(cls, data: D) -> "GenericAppResult[D, E]":
         """
         Crée une réponse de succès avec les données fournies.
         Args:
-            data (T) : Les données à inclure dans la réponse de succès.
+            data (D) : Les données à inclure dans la réponse de succès.
         Returns:
-            GenericAppResult[T, U] : Une instance de GenericAppResult représentant un succès.
+            GenericAppResult[D, E] : Une instance de GenericAppResult représentant un succès.
         """
         # pyrefly: ignore [bad-return]
         return cls(ok=True, data=data)

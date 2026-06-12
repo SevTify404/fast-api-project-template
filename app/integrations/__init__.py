@@ -1,11 +1,11 @@
 from typing import Generic, Optional, TypeAlias
 
-from app.globals.app_result import GenericAppResult, T, U
+from app.globals.app_result import GenericAppResult, D, E
 from app.globals.businnes_error import AppError
 from app.globals.services_names import ServicesNames
 
 
-class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
+class IntegrationServiceResult(GenericAppResult[D, E], Generic[D, E]):
     """
     Classe générique pour typer les réponses d'opérations des Services Intégrés.
     """
@@ -15,8 +15,8 @@ class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
         ok: bool,
         service_name: str,
         status_code: int,
-        data: Optional[T] = None,
-        error: Optional[U] = None,
+        data: Optional[D] = None,
+        error: Optional[E] = None,
     ):
         """
         Initialise une instance de IntegrationServiceResult.
@@ -52,10 +52,10 @@ class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
     @classmethod
     def integration_service_success(
         cls,
-        data: T,
+        data: D,
         status_code: int = 200,
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
-    ) -> "IntegrationServiceResult[T, U]":
+    ) -> "IntegrationServiceResult[D, E]":
         """Crée une réponse de succès avec les données fournies."""
         # pyrefly: ignore [bad-return]
         return cls(
@@ -65,10 +65,10 @@ class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
     @classmethod
     def integration_service_failure(
         cls,
-        error: U,
+        error: E,
         status_code: int = 500,
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
-    ) -> "IntegrationServiceResult[T, U]":
+    ) -> "IntegrationServiceResult[D, E]":
         """Crée une réponse d'erreur avec l'objet d'erreur fourni."""
         # pyrefly: ignore [bad-return]
         return cls(
@@ -76,4 +76,4 @@ class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
         )
 
 
-AppIntegrationServiceResult: TypeAlias = IntegrationServiceResult[T, AppError]
+AppIntegrationServiceResult: TypeAlias = IntegrationServiceResult[D, AppError]

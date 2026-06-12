@@ -1,13 +1,13 @@
 from typing import Generic, Optional
 from fastapi import Response
 
-from app.globals.app_result import GenericAppResult, T, U
+from app.globals.app_result import GenericAppResult, D, E
 from app.globals.businnes_error import AppError
 from app.globals.services_names import ServicesNames
 from app.schemas.globals.api_base_response import ApiBaseResponse
 
 
-class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
+class ServiceResult(GenericAppResult[D, E], Generic[D, E]):
     """
     Classe générique pour typer les réponses d'opérations des Services.
 
@@ -20,8 +20,8 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
         ok: bool,
         service_name: str,
         status_code: int,
-        data: Optional[T] = None,
-        error: Optional[U] = None,
+        data: Optional[D] = None,
+        error: Optional[E] = None,
     ):
         super().__init__(ok=ok, data=data, error=error)
         self._service_name: str = service_name
@@ -42,7 +42,7 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
     def status_code(self) -> int:
         return self._status_code
 
-    def to_HTTP_api_base_response(self, reponse: Response) -> ApiBaseResponse[T, U]:
+    def to_HTTP_api_base_response(self, reponse: Response) -> ApiBaseResponse[D, E]:
         """
         Methode pour convertir une instance de ServiceResult en une réponse HTTP API standardisée (ApiBaseResponse)
         à retourner aux clients de l'API.
@@ -59,13 +59,13 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
 
         """
         if self.is_error():
-            return ApiBaseResponse[T, U].error_response(
+            return ApiBaseResponse[D, E].error_response(
                 error_message=self.error,
                 response=reponse,
                 status_code=self.status_code,
             )
 
-        return ApiBaseResponse[T, U].success_response(
+        return ApiBaseResponse[D, E].success_response(
             data=self.data, response=reponse, status_code=self.status_code
         )
 
@@ -74,10 +74,10 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
     @classmethod
     def service_success(
         cls,
-        data: T,
+        data: D,
         status_code: int = 200,
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
-    ) -> "ServiceResult[T, U]":
+    ) -> "ServiceResult[D, E]":
         """
         Crée une réponse de succès avec les données fournies, le code de status HTTP à retourner et le nom du service.
         Args:
@@ -96,10 +96,10 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
     @classmethod
     def service_failure(
         cls,
-        error: U,
+        error: E,
         status_code: int = 500,
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
-    ) -> "ServiceResult[T, U]":
+    ) -> "ServiceResult[D, E]":
         """
         Crée une réponse d'erreur avec le message fourni, le code de status HTTP à retourner et le nom du service.
         Args:
@@ -116,4 +116,4 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
         )
 
 
-DefaultAppServiceResult = ServiceResult[T, AppError]
+DefaultAppServiceResult = ServiceResult[D, AppError]
