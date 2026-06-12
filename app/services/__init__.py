@@ -1,4 +1,4 @@
-from typing import Generic, Optional, Any
+from typing import Generic, Optional
 from fastapi import Response
 
 from app.globals.app_result import GenericAppResult, T, U
@@ -54,19 +54,19 @@ class ServiceResult(GenericAppResult[T, U], Generic[T, U]):
             reponse: L'objet Response de FastAPI pour pouvoir modifier le status code de la réponse HTTP à retourner.
 
         Returns:
-            ApiBaseResponse[T, U]:  Une instance de ApiBaseResponse contenant les données de succès ou le message d'erreur,
+            ApiBaseResponse[T, U] :  Une instance de ApiBaseResponse contenant les données de succès ou le message d'erreur,
              avec le code de status HTTP approprié.
 
         """
         if self.is_error():
-            return ApiBaseResponse[Any, Any].error_response(
-                error_message=self._error,
+            return ApiBaseResponse[T, U].error_response(
+                error_message=self.error,
                 response=reponse,
                 status_code=self.status_code,
             )
 
-        return ApiBaseResponse[Any, Any].success_response(
-            data=self._data, response=reponse, status_code=self.status_code
+        return ApiBaseResponse[T, U].success_response(
+            data=self.data, response=reponse, status_code=self.status_code
         )
 
     # --- Fonctions d'aide (Helpers) ---

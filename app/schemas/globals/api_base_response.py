@@ -10,9 +10,14 @@ from app.globals.businnes_error import AppError
 class ApiBaseResponse(BaseModel, Generic[T, U]):
     """Scema de base pour uniformiser les réponses de l'API"""
 
-    ok: bool = Field(
+    success: bool = Field(
         ...,
         title="Champ pour véreifier si la reequete à réussi, True si la requete a reussi, False sinon",
+    )
+
+    status_code: int = Field(
+        ...,
+        title="Champ pour véreifier le code de status HTTP de la réponse, 200 pour les succès, 400 pour les erreurs client, 500 pour les erreurs serveur, etc.",
     )
 
     result: Optional[T] = Field(
@@ -29,9 +34,9 @@ class ApiBaseResponse(BaseModel, Generic[T, U]):
 
     @model_validator(mode="after")
     def check_response(self):
-        if self.ok and self.error is not None:
+        if self.success and self.error is not None:
             raise ValueError("Le champ error doit être null lorsque ok est True")
-        if not self.ok and self.result is not None:
+        if not self.success and self.result is not None:
             raise ValueError("Le champ result doit être null lorsque ok est False")
         return self
 
@@ -53,7 +58,7 @@ class ApiBaseResponse(BaseModel, Generic[T, U]):
         response.status_code = status_code
 
         # pyrefly: ignore [bad-return]
-        return cls(ok=True, result=data, error=None)
+        return cls(success=True, result=data, error=None, status_code=status_code)
 
     # Cette methode permettra de renvoyer les reponse d'erreur directement depuis les classes filles
     @classmethod
@@ -72,7 +77,7 @@ class ApiBaseResponse(BaseModel, Generic[T, U]):
         response.status_code = status_code
 
         # pyrefly: ignore [bad-return]
-        return cls(ok=False, result=None, error=error_message)
+        return cls(success=False, result=None, error=error_message, status_code=status_code)
 
 
 DefaultAppApiResponse: TypeAlias = ApiBaseResponse[T, AppError]
