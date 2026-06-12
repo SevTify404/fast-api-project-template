@@ -41,7 +41,7 @@ def health():
 
 @app.get("/", include_in_schema=False)
 async def root():
-    return {"message": "Backend de Journal IAI, tout fonctionne bien ici :)"}
+    return {"message": "Running :)"}
 
 
 # Utile exclusivement pour debugger en local, ne s'execute pas si on lance le serveur via Docker normalement
