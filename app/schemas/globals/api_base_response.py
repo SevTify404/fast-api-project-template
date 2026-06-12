@@ -1,14 +1,16 @@
-from typing import Generic, TypeVar, Optional
+from typing import Generic, Optional
+from typing_extensions import TypeVar
 from fastapi import Response
 from pydantic import BaseModel, Field, model_validator
 
 from app.globals.businnes_error import AppError
 
 T = TypeVar("T")
+E = TypeVar("E", default=AppError)
 
 
 # Modele de base pour toutes les reponses de l'API
-class ApiBaseResponse(BaseModel, Generic[T]):
+class ApiBaseResponse(BaseModel, Generic[T, E]):
     """Scema de base pour uniformiser les réponses de l'API"""
 
     ok: bool = Field(
@@ -22,7 +24,7 @@ class ApiBaseResponse(BaseModel, Generic[T]):
         description="Présent seulement si la requet à réussi",
     )
 
-    error: Optional[AppError] = Field(
+    error: Optional[E] = Field(
         default=None,
         title="Champ des erreurs",
         description="Présent seulement si la requete à échouée ou si quelque chose s'est mal passé durant le traitement",
@@ -56,7 +58,7 @@ class ApiBaseResponse(BaseModel, Generic[T]):
     # Cette methode permettra de renvoyer les reponse d'erreur directement depuis les classes filles
     @classmethod
     def error_response(
-        cls, error_message: AppError, response: Response, status_code: int = 400
+        cls, error_message: E, response: Response, status_code: int = 400
     ):
         """
         Methode pour instancier une réponse d'échec

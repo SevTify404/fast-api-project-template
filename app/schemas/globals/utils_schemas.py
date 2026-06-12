@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from app.schemas.globals.api_base_response import ApiBaseResponse
+from app.globals.businnes_error import AppError
 
 
 class StringMessage(BaseModel):
@@ -14,7 +15,7 @@ class StringMessage(BaseModel):
     )
 
 
-class GlobalStringResponse(ApiBaseResponse):
+class GlobalStringResponse(ApiBaseResponse[StringMessage, AppError]):
     """
     Réponse contennant uniquement un message de type string, utiliser pour les endpoints qui ne retournent
     pas de données spécifiques, mais juste un message de succès

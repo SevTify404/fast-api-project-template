@@ -1,13 +1,15 @@
-from typing import TypeVar, Generic, Optional
+from typing import Generic, Optional
+from typing_extensions import TypeVar
 
 from app.globals.app_result import GenericAppResult
 from app.globals.businnes_error import AppError
 from app.globals.services_names import ServicesNames
 
 T = TypeVar("T")
+U = TypeVar("U", default=AppError)
 
 
-class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
+class IntegrationServiceResult(GenericAppResult[T, U], Generic[T, U]):
     """
     Classe générique pour typer les réponses d'opérations des Services Intégrés.
     """
@@ -18,7 +20,7 @@ class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
         service_name: str,
         status_code: int,
         data: Optional[T] = None,
-        error: Optional[AppError] = None,
+        error: Optional[U] = None,
     ):
         """
         Initialise une instance de IntegrationServiceResult.
@@ -57,7 +59,7 @@ class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
         data: T,
         status_code: int = 200,
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
-    ) -> "IntegrationServiceResult[T]":
+    ) -> "IntegrationServiceResult[T, U]":
         """Crée une réponse de succès avec les données fournies."""
         return cls(
             ok=True, data=data, status_code=status_code, service_name=service_name
@@ -66,10 +68,10 @@ class IntegrationServiceResult(GenericAppResult[T, AppError], Generic[T]):
     @classmethod
     def integration_service_failure(
         cls,
-        error: AppError,
+        error: U,
         status_code: int = 500,
         service_name: str = ServicesNames.UNKNOWN_SERVICE,
-    ) -> "IntegrationServiceResult[T]":
+    ) -> "IntegrationServiceResult[T, U]":
         """Crée une réponse d'erreur avec l'objet d'erreur fourni."""
         return cls(
             ok=False, error=error, status_code=status_code, service_name=service_name
