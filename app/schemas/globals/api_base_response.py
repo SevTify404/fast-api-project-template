@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeAlias
+from typing import Generic, Optional
 from fastapi import Response
 from pydantic import BaseModel, Field, model_validator
 
@@ -82,4 +82,4 @@ class ApiBaseResponse(BaseModel, Generic[D, E]):
         )
 
 
-DefaultAppApiResponse: TypeAlias = ApiBaseResponse[D, AppError]
+DefaultAppApiResponse = ApiBaseResponse[D, AppError]

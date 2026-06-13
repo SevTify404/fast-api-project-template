@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeAlias
+from typing import Generic, Optional
 
 from app.globals.app_result import GenericAppResult, D, E
 from app.globals.businnes_error import AppError
@@ -76,4 +76,4 @@ class IntegrationServiceResult(GenericAppResult[D, E], Generic[D, E]):
         )
 
 
-AppIntegrationServiceResult: TypeAlias = IntegrationServiceResult[D, AppError]
+AppIntegrationServiceResult = IntegrationServiceResult[D, AppError]

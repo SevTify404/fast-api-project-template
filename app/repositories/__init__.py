@@ -1,4 +1,4 @@
-from typing import Generic, Optional, Any, TypeAlias
+from typing import Generic, Optional, Any
 
 from app.globals.app_result import GenericAppResult, D, E
 from app.globals.businnes_error import AppError
@@ -62,4 +62,4 @@ class CrudResult(GenericAppResult[D, E], Generic[D, E]):
         return result
 
 
-DefaultAppCrudResult: TypeAlias = CrudResult[D, AppError]
+DefaultAppCrudResult = CrudResult[D, AppError]

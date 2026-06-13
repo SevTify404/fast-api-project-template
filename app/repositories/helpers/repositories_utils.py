@@ -1,12 +1,18 @@
 from logging import Logger
+from typing import TypeVar
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import status
 
+from app.db.mixins.integrity_error_mixin import IntegrityMapperMixin
 from app.globals.businnes_error import AppError, AppErrorType
 from app.globals.messages import Messages
 from app.repositories import CrudResult, DefaultAppCrudResult
+
+IntegrityMapperCompatibleT = TypeVar(
+    "IntegrityMapperCompatibleT", bound=IntegrityMapperMixin
+)
 
 
 class RepositoriesUtils:
@@ -44,7 +50,7 @@ class RepositoriesUtils:
         exception: IntegrityError,
         session: AsyncSession,
         logger: Logger,
-        model_class,
+        model_class: type[IntegrityMapperCompatibleT],
     ) -> DefaultAppCrudResult:
         """
         Traite une exception d'intégrité en cherchant une conrespondance dans le dictionnaire des contrainte de la classe
@@ -79,7 +85,11 @@ class RepositoriesUtils:
 
     @classmethod
     async def traiter_errors_en_global(
-        cls, exception: Exception, session: AsyncSession, logger: Logger, model_bd
+        cls,
+        exception: Exception,
+        session: AsyncSession,
+        logger: Logger,
+        model_bd: type[IntegrityMapperCompatibleT],
     ) -> DefaultAppCrudResult:
         """
         Traite une exception en gérant IntegrityError et Exception en meme temps

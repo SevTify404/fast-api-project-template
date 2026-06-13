@@ -7,6 +7,7 @@ class BaseCacheEntity:
     """Defininis toutes les entités qui peuvent être mises en cache avec leurs clés respectives"""
 
     USER = "entity:user:{id}"
+    SESSION = "entity:session:{id}"
 
 
 class AvailableCacheKeys(str, Enum):
@@ -17,3 +18,6 @@ class AvailableCacheKeys(str, Enum):
 
     # Clés de cache pour les utilisateurs
     USER_OBJECT = BaseCacheEntity.USER  # Clé pour un utilisateur spécifique
+
+    # Clés de cache pour les sessions
+    SESSION_OBJECT = BaseCacheEntity.SESSION  # Clé pour une session spécifique

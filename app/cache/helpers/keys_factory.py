@@ -15,6 +15,9 @@ class CacheKeysFactory:
         AvailableCacheKeys.USER_OBJECT: CacheKey.new_key(
             AvailableCacheKeys.USER_OBJECT, 1
         ),
+        AvailableCacheKeys.SESSION_OBJECT: CacheKey.new_key(
+            AvailableCacheKeys.SESSION_OBJECT, 1
+        ),
     }
 
     @classmethod
