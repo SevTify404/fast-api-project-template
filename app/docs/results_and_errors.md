@@ -142,10 +142,12 @@ class PaymentApiResponse(ApiBaseResponse[PaymentResponse, PaymentErrorDetail]):
     # Pas besoin de redéclarer les champs, ils sont hérités et typés automatiquement !
 ```
 
-Puis dans votre routeur :
+Puis dans votre routeur, utilisez cette sous-classe comme `response_model`, mais annotez le retour Python avec le type réellement renvoyé par `to_HTTP_api_base_response`.
+Le helper retourne actuellement `ApiBaseResponse[D, E]`, pas la sous-classe concrète `PaymentApiResponse`. Un type checker ne peut donc pas inférer automatiquement que `ApiBaseResponse[PaymentResponse, PaymentErrorDetail]` est compatible avec `PaymentApiResponse`, même si FastAPI/Pydantic valident correctement la réponse au runtime.
+
 ```python
 @router.post("/pay", response_model=PaymentApiResponse)
-async def pay(response: Response) -> PaymentApiResponse:
+async def pay(response: Response) -> ApiBaseResponse[PaymentResponse, PaymentErrorDetail]:
     service_res = payment_service.process_payment(100.0)
     
     # Le retour est converti et validé proprement
@@ -164,10 +166,15 @@ class ReadUserApiResponse(DefaultAppApiResponse[UserResponse]):
 Puis dans votre routeur :
 ```python
 @router.get("/users/{user_id}", response_model=ReadUserApiResponse)
-async def read_user(user_id: int, response: Response) -> ReadUserApiResponse:
+async def read_user(user_id: int, response: Response) -> ApiBaseResponse[UserResponse, AppError]:
     service_res = user_service.get_user_profile(user_id)
     return service_res.to_HTTP_api_base_response(response)
 ```
+
+En résumé :
+- `response_model=ReadUserApiResponse` sert à FastAPI, à la validation de sortie et à Swagger/OpenAPI.
+- `-> ApiBaseResponse[UserResponse, AppError]` sert au typage statique Python, car c'est le type réellement retourné par `to_HTTP_api_base_response`.
+- Annoter la route avec `-> ReadUserApiResponse` provoque généralement une erreur de typage tant que le helper ne construit pas explicitement cette sous-classe.
 
 ---
 
@@ -175,7 +182,9 @@ async def read_user(user_id: int, response: Response) -> ReadUserApiResponse:
 
 > [!TIP]
 > - **Utilisez toujours les helpers de classe** (`crud_success`, `service_failure`, etc.) au lieu d'instancier les classes directement via `__init__`.
-> - **Utilisez l'approche par sous-classage de `ApiBaseResponse` ou `DefaultAppApiResponse`** pour toutes les routes publiques afin de garder votre documentation Swagger claire et professionnelle.
+> - **Utilisez l'approche par sous-classage de `ApiBaseResponse` ou `DefaultAppApiResponse` dans `response_model`** pour toutes les routes publiques afin de garder votre documentation Swagger claire et professionnelle.
+> - **Gardez l'annotation de retour alignée avec le helper utilisé** : avec `to_HTTP_api_base_response`, annotez `ApiBaseResponse[D, E]`, pas la sous-classe OpenAPI.
 
 > [!WARNING]
 > - **Ne pas court-circuiter le typage** en utilisant `Any` comme type d'erreur si vous connaissez la structure de l'erreur. Spécifier la structure permet au frontend d'avoir un typage rigoureux généré via OpenAPI.
+> - **Ne confondez pas `response_model` et annotation de retour** : `response_model` pilote FastAPI/OpenAPI, l'annotation `-> ...` pilote le type checker.

@@ -56,5 +56,5 @@ class UserInfos(DefaultAppApiResponse[ReadUser]):
     """Infos sur un utilisateur"""
 
 
-class ListUserInfos(ApiBaseResponse[List[ReadUser]]):
+class ListUserInfos(DefaultAppApiResponse[List[ReadUser]]):
     """Liste des utilisateurs"""
