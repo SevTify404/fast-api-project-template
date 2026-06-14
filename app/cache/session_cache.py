@@ -80,7 +80,7 @@ class SessionCache:
         except Exception as e:
             CacheUtils.traiter_exceptions(e, logger)
 
-    async def delete_session_from_cache(self, session_id: UUID):
+    async def invalid_session_in_cache(self, session_id: UUID):
         """Fonction permettant de supprimer les infos d'une session du cache.
 
         Args:

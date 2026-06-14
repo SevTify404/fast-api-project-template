@@ -8,6 +8,7 @@ class AppErrorType(str, Enum):
     NOT_FOUND = "NOT_FOUND"
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
     BAD_REQUEST = "BAD_REQUEST"
+    UNAUTHORIZED = "UNAUTHORIZED"
 
 
 class AppError(BaseModel):
@@ -24,3 +25,6 @@ class AppError(BaseModel):
         description="Présent seulement si la requete à échouée ou si quelque chose s'est mal pa"
         "ssé durant le traitement",
     )
+
+    def __str__(self):
+        return f"AppError(type={self.error_type}, message={self.error_message})"

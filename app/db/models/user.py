@@ -15,11 +15,10 @@ from sqlalchemy import (
     DateTime,
     Index,
     String,
-    Boolean,
     func,
 )
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.config import Base
 from app.db.mixins.integrity_error_mixin import IntegrityMapperMixin
@@ -27,11 +26,10 @@ from app.db.models.enums.enums import SexeType, UserType
 
 if TYPE_CHECKING:
     # Import your models here for avoid circular imports and keep IDE type cheek
-    pass
+    from app.db.models.session import Session
 
 # Noms des contraintes
 UQ_USERS_USERNAME = "uq_users_username"
-UQ_USERS_EMAIL = "uq_users_email"
 IDX_USERS_CREATED_AT_ID = "idx_users_created_at_id"
 IDX_USERS_ROLE = "idx_users_role"
 IDX_USERS_DELETED_AT = "idx_users_deleted_at"
@@ -44,25 +42,14 @@ class User(Base, IntegrityMapperMixin):
 
     # Attributs
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid.uuid4, init=False)
-    email: Mapped[str] = mapped_column(String(255), nullable=False)
     username: Mapped[str] = mapped_column(String(50), nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # Informations personnelles
-    last_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     sexe: Mapped[SexeType] = mapped_column(SQLEnum(SexeType), nullable=False)
 
     # Rôle et permissions
     role: Mapped[UserType] = mapped_column(
         SQLEnum(UserType), default=UserType.USER, nullable=False, init=False
-    )
-
-    # Métadonnées
-
-    is_verified: Mapped[bool] = mapped_column(
-        Boolean, default=False, nullable=False, init=False
     )
 
     # Soft delete
@@ -91,29 +78,30 @@ class User(Base, IntegrityMapperMixin):
     __table_args__ = (
         Index(
             IDX_USERS_CREATED_AT_ID,
-            "created_at",
-            "id",
+            created_at,
+            id,
             postgresql_where=(deleted_at == None),
-        ),
-        Index(
-            UQ_USERS_EMAIL, "email", unique=True, postgresql_where=(deleted_at == None)
         ),
         Index(
             UQ_USERS_USERNAME,
-            "username",
+            username,
             unique=True,
             postgresql_where=(deleted_at == None),
         ),
-        Index(IDX_USERS_ROLE, "role", postgresql_where=(deleted_at == None)),
-        Index(
-            IDX_USERS_DELETED_AT, "deleted_at", postgresql_where=(deleted_at != None)
-        ),
+        Index(IDX_USERS_ROLE, role, postgresql_where=(deleted_at == None)),
+        Index(IDX_USERS_DELETED_AT, deleted_at, postgresql_where=(deleted_at != None)),
     )
 
     # Relationships
+    sessions: Mapped[list["Session"]] = relationship(
+        "Session",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        uselist=True,
+        init=False,
+    )
 
     # Messages d'erreur
     ERROR_MESSAGES = {
-        UQ_USERS_EMAIL: "Cet email est déjà utilisé.",
         UQ_USERS_USERNAME: "Ce nom d'utilisateur est déjà pris.",
     }

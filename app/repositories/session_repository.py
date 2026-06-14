@@ -13,6 +13,7 @@ from app.schemas.session_schemas import CreateSession
 from app.utils.security_utils import hasher_password
 from app.globals.messages import Messages
 from fastapi import status
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -81,15 +82,41 @@ class SessionRepository:
 
     async def delete_session(self, sid: UUID) -> DefaultAppCrudResult[None]:
         """Fonction pour supprimer une session à partir de son ID"""
+        try:
+            session = await self.get_session_by_sid(sid)
 
-        session = await self.get_session_by_sid(sid)
+            if session.is_error():
+                return CrudResult.crud_failure(
+                    session.error, status_code=session.status_code
+                )
 
-        if session.is_error():
-            return CrudResult.crud_failure(
-                session.error, status_code=session.status_code
+            await self.db.delete(session.data)
+            await self.db.commit()
+
+            return CrudResult.crud_success(None, status_code=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return await RepositoriesUtils.traiter_errors_en_global(
+                e, self.db, logger, Session
             )
 
-        await self.db.delete(session.data)
-        await self.db.commit()
+    async def revoke_session(self, sid: UUID) -> DefaultAppCrudResult[None]:
+        """Fonction pour révoquer une session à partir de son ID"""
+        try:
+            session = await self.get_session_by_sid(sid)
 
-        return CrudResult.crud_success(None, status_code=status.HTTP_204_NO_CONTENT)
+            if session.is_error():
+                return CrudResult.crud_failure(
+                    session.error, status_code=session.status_code
+                )
+
+            session = session.data
+
+            session.expires_at = datetime.now()
+
+            await self.db.commit()
+
+            return CrudResult.crud_success(None, status_code=status.HTTP_200_OK)
+        except Exception as e:
+            return await RepositoriesUtils.traiter_errors_en_global(
+                e, self.db, logger, Session
+            )

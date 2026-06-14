@@ -2,6 +2,7 @@ fastapi[standard]          # FastAPI with all optional dependencies for full fun
 pydantic                   # Data validation and settings management using Python type annotations
 uvicorn[standard]          # ASGI server for FastAPI, with optional dependencies for improved performance and features
 python-jose                # passlib[bcrypt]       # Uncomment if you need password hashing support
+types-python-jose
 SQLAlchemy                 # SQL toolkit and Object-Relational Mapping (ORM) library for Python
 asyncpg                    # PostgreSQL database adapter for Python, optimized for performance
 python-dotenv              # For loading environment variables from a .env file, useful for configuration management

@@ -33,7 +33,7 @@ class ReadSession(BaseModel):
     expires_at: datetime
     created_at: datetime
 
-    def is_valide_session(self) -> bool:
+    def is_valid_session(self) -> bool:
         """Fonction pour vérifier si une session est valide"""
 
         # On force maintenant en UTC pour avoir un meme fuseau horaire
