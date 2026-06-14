@@ -12,12 +12,11 @@ except (
 
 
 from app.core.config import APP_PORT
+from app.middlewares.setup import setup_middlewares
 
 from app.settings.app_lifespan import lifespan
 from app.settings.cors import setup_app_cors
 
-from app.middlewares.exception_handler_middleware import handle_exceptions
-from app.middlewares.request_logging_middleware import log_requests
 from app.routers.v1.base_router import v1_api_router
 
 import uvicorn
@@ -27,9 +26,7 @@ app = FastAPI(lifespan=lifespan, title="FastApi Template Backend", version="1.0.
 
 setup_app_cors(app)
 
-app.middleware("http")(handle_exceptions)
-app.middleware("http")(log_requests)
-
+setup_middlewares(app)
 
 app.include_router(v1_api_router)
 
