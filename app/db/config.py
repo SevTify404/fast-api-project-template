@@ -25,7 +25,9 @@ DATABASE_URL = f"{DATABASE_TYPE}+{DATABASE_PILOT}://{DATABASE_USER}:{DATABASE_PA
 # Configuration de l'engine
 # future=True, permet de refuser directment l'utilisation des methodes deprecatedd
 engine = create_async_engine(
-    DATABASE_URL, echo=True, future=True, connect_args={"statement_cache_size": 0}
+    DATABASE_URL,
+    future=True,
+    connect_args={"statement_cache_size": 0, "timeout": 5},
 )
 
 

@@ -38,7 +38,7 @@ class SessionService:
             logger.error(f"Erreur: {session_repo.error}")
             return session_repo.to_service_error(service_name=self._service_name)
 
-        session_read = ReadSession.model_validate(session_data)
+        session_read = ReadSession.model_validate(session_repo.data)
         await self.__session_cache.set_session_in_cache(
             session_id=session_repo.data.id,
             session=session_read,

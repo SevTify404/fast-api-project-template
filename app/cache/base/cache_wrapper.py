@@ -617,6 +617,10 @@ class CacheWrapper:
         """
         await self._connection.aclose()
 
+    async def ping(self) -> bool:
+        """Verifie que Redis repond correctement."""
+        return await self._connection.ping()
+
 
 class CacheManager:
     """Classe singleton pour gérer la connexion à Redis et les opérations de cache."""
@@ -637,12 +641,18 @@ class CacheManager:
             REDIS_URL,
             max_connections=20,  # Limite le nombre de connexions simultanées à Redis
             decode_responses=True,  # Permet de décoder les réponses en string automatiquement
+            socket_connect_timeout=5,
+            socket_timeout=5,
         )
 
     def get_redis_connection_from_pool(self) -> CacheWrapper:
         """Obtenir une instance du client Redis, en utilisant un pool de connexions pour une meilleure performance."""
 
         return CacheWrapper(Redis(connection_pool=self._pool))
+
+    async def disconnect_pool(self) -> None:
+        """Ferme les connexions ouvertes du pool Redis."""
+        await self._pool.disconnect(inuse_connections=True)
 
 
 cache_manager = CacheManager()  # singleton global

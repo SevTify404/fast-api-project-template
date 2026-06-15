@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.core.logging_config import setup_logging, silencer_loggers_externes
+from app.settings.dependencies_health import check_startup_dependencies
 
 
 @asynccontextmanager
@@ -13,6 +14,7 @@ async def lifespan(_: FastAPI):
     try:
         setup_logging()
         silencer_loggers_externes()
+        await check_startup_dependencies()
     except Exception as e:
         print(
             f"Exception {e.__class__.__name__} lors du démarrade de l'application : {e}"

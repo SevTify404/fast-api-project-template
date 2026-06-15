@@ -52,7 +52,7 @@ class _UserAuthDependencies:
         if access_token is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Aucun clé d'access fourni !",
+                detail="Vous n'etes pas connecté",
             )
 
         payload = JWTManager.decode_access_token(

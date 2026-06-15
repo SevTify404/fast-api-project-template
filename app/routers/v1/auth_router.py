@@ -11,6 +11,7 @@ from app.schemas.globals.utils_schemas import GlobalStringResponse, StringMessag
 from app.schemas.user_schemas import CreateUser, LoginData, ReadUser, UserInfos
 from app.services.auth_service import AuthService
 from app.services.user_service import UserService
+from app.auth.dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=[ApiTags.AUTHENTIFICATION])
 
@@ -45,14 +46,13 @@ async def register(
     return service_result.to_HTTP_api_base_response(reponse=response)
 
 
-## -------------- Route pour vérifier le OTP : Etape 2 de la connexion ------------- ##
 @router.post("/login", response_model=UserInfos)
-async def login_verify_otp(
+async def login(
     login_data: LoginData,
     response: Response,
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ) -> ApiBaseResponse[ReadUser, AppError]:
-    """Route d'authentification pour verifier le OTP"""
+    """Route d'authentification pour se connecter"""
 
     auth_service_result = await auth_service.login(login_data=login_data)
 
@@ -87,3 +87,15 @@ async def logout(
     auth_service_result = await auth_service.service_logout_account()
 
     return auth_service_result.to_HTTP_api_base_response(reponse=response)
+
+
+@router.get("/me", response_model=UserInfos)
+async def me(
+    response: Response,
+    current_user: Annotated[ReadUser, Depends(get_current_user)],
+    auth_service: Annotated[AuthService, Depends(get_auth_service)],
+) -> ApiBaseResponse[ReadUser, AppError]:
+    """Route pour récupérer les infos de l'utilisateur actuellement connecté"""
+
+    res = auth_service.get_me(user=current_user)
+    return res.to_HTTP_api_base_response(reponse=response)

@@ -71,7 +71,7 @@ class User(Base, IntegrityMapperMixin):
     )
 
     last_login_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True
+        DateTime(timezone=True), nullable=True, init=False
     )
 
     # Index

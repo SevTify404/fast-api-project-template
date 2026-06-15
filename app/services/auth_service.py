@@ -130,7 +130,7 @@ class AuthService:
         if access_token is None:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Aucune clé d'access fourni",
+                detail="Vous n'etes pas connecté",
             )
 
         payload = JWTManager.decode_access_token(
@@ -182,7 +182,7 @@ class AuthService:
         )
 
     ## ---------------- Service pour gérer les déconnexion / logout ------------------ ##
-    async def service_logout_account(self) -> ServiceResult[StringMessage]:
+    async def service_logout_account(self) -> DefaultAppServiceResult[StringMessage]:
         """Logique métier pour gérer les déconnexion / logout"""
 
         revoke_res = await self.__session_service.revoke_session(
@@ -201,5 +201,13 @@ class AuthService:
 
         return ServiceResult.service_success(
             data=StringMessage(message="Déconnexion effectué avec succès"),
+            service_name=self._service_name,
+        )
+
+    def get_me(self, user: ReadUser) -> DefaultAppServiceResult[ReadUser]:
+        """Logique métier pour récupérer les infos de l'utilisateur actuellement connecté"""
+
+        return ServiceResult.service_success(
+            data=user,
             service_name=self._service_name,
         )
