@@ -10,6 +10,14 @@ This project serves as a starting structure (boilerplate/template) for developin
 
 ---
 
+## GitHub Template Repository
+This repository is configured as a **GitHub Template Repository**. You can create a new repository from this template with one click:
+- Click "Use this template" on GitHub
+- Select "Create a new repository"
+- Clone your new repository and you're ready to go!
+
+---
+
 > **🌍 Documentation Available in Other Languages**
 > - [Français (French)](./README_fr.md)
 
@@ -142,12 +150,6 @@ celery -A app.worker.celery_app worker --loglevel=info
 ## 4. Docker & Quick Start
 
 This project includes a complete Docker configuration that is **operational and ready to use** out of the box. The setup is designed for immediate use - just copy, paste, and run!
-
-### GitHub Template Repository
-This repository is configured as a **GitHub Template Repository**. You can create a new repository from this template with one click:
-- Click "Use this template" on GitHub
-- Select "Create a new repository"
-- Clone your new repository and you're ready to go!
 
 ### Docker Compose Setup
 The `docker-compose.yml` file provides a complete development environment with:
