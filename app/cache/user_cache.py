@@ -24,7 +24,7 @@ class UserCache:
     def create_user_cache_key(user_id: UUID) -> CacheKey:
 
         cache_key = CacheKeysFactory.get_cache_key(
-            AvailableCacheKeys.SESSION_OBJECT
+            AvailableCacheKeys.USER_OBJECT
         ).set_arguments(id=str(user_id))
 
         return cache_key

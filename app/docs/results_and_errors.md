@@ -2,6 +2,8 @@
 
 Ce document explique le fonctionnement du système de retour standardisé de l'application et comment l'utiliser pour gérer à la fois les données de succès et les erreurs de manière type-safe dans les couches **Repository**, **Service**, **Integration** et **API**.
 
+Le code source associé à ce système est localisé dans [app/globals/app_result.py](file:///home/sevtify/Projets/fast-api-project-template/app/globals/app_result.py).
+
 ---
 
 ## 1. Principes de base
@@ -11,15 +13,15 @@ Toutes les réponses internes de l'application héritent d'une classe de base g�
 - **`E`** représente le type d'erreur retourné en cas d'**échec** (par défaut, `AppError`).
 
 Le système fournit trois classes spécialisées pour chaque couche de l'architecture :
-1. **`CrudResult[D, E]`** (couche Repository)
-2. **`ServiceResult[D, E]`** (couche Service)
-3. **`IntegrationServiceResult[D, E]`** (couche Services Externes/Intégrations)
+1. **`CrudResult[D, E]`** (couche [Repository](file:///home/sevtify/Projets/fast-api-project-template/app/repositories/__init__.py))
+2. **`ServiceResult[D, E]`** (couche [Service](file:///home/sevtify/Projets/fast-api-project-template/app/services/__init__.py))
+3. **`IntegrationServiceResult[D, E]`** (couche [Intégrations Externes](file:///home/sevtify/Projets/fast-api-project-template/app/integrations/__init__.py))
 
 ---
 
 ## 2. Utilisation Standard (Erreurs par défaut : `AppError`)
 
-Dans la majorité des cas, l'erreur par défaut `AppError` est suffisante. 
+Dans la majorité des cas, l'erreur par défaut [AppError](file:///home/sevtify/Projets/fast-api-project-template/app/globals/businnes_error.py) est suffisante. 
 
 Pour simplifier l'écriture et améliorer la lisibilité du code, des alias de types préconfigurés avec `AppError` sont mis à disposition :
 - **`DefaultAppCrudResult[D]`** est un alias de `CrudResult[D, AppError]`
@@ -33,11 +35,11 @@ Ces alias ne nécessitent qu'un seul paramètre générique (le type de donnée 
 
 ```python
 from app.repositories import DefaultAppCrudResult, CrudResult
-from app.schemas.users import UserResponse  # Modèle Pydantic
+from app.schemas.user_schemas import ReadUser  # Modèle Pydantic
+from app.globals.businnes_error import AppError, AppErrorType
 
-
-def get_user_by_id(user_id: int) -> DefaultAppCrudResult[UserResponse]:
-    user = db.query(User).filter(User.id == user_id).first()
+async def get_user_by_id(user_id: UUID) -> DefaultAppCrudResult[User]:
+    user = await db.get(User, user_id)
     if not user:
         # L'erreur par défaut est AppError
         error = AppError(
@@ -46,28 +48,27 @@ def get_user_by_id(user_id: int) -> DefaultAppCrudResult[UserResponse]:
         )
         return CrudResult.crud_failure(error, status_code=404)
 
-    return CrudResult.crud_success(UserResponse.model_validate(user))
-
+    return CrudResult.crud_success(user)
 ```
 
 ### Exemple dans un Service (Propagation et Conversion) :
 
 ```python
 from app.services import DefaultAppServiceResult, ServiceResult
-from app.repositories import UserRepository
+from app.repositories.user_repository import UserRepository
+from app.schemas.user_schemas import ReadUser
 
-
-def get_user_profile(user_id: int) -> DefaultAppServiceResult[UserResponse]:
+async def get_user_profile(user_id: UUID) -> DefaultAppServiceResult[ReadUser]:
     # Appel au repository
-    repo_res = UserRepository.get_user_by_id(user_id)
+    repo_res = await UserRepository(db).get_user_by_id(user_id)
 
     if repo_res.is_error():
         # Conversion directe du CrudResult d'erreur en ServiceResult d'erreur.
         # Le type d'erreur (AppError) et le code de statut (404) sont conservés.
         return repo_res.to_service_error(service_name="UserService")
 
-    return ServiceResult.service_success(repo_res.data)
-
+    read_user = ReadUser.model_validate(repo_res.data)
+    return ServiceResult.service_success(read_user)
 ```
 
 ---
@@ -154,26 +155,28 @@ async def pay(response: Response) -> ApiBaseResponse[PaymentResponse, PaymentErr
     return service_res.to_HTTP_api_base_response(response)
 ```
 
-Pour les routes simples qui n'ont pas de schéma d'erreur personnalisé, il existe un alias de `ApiBaseResponse` 
-préconfiguré avec `AppError` : `DefaultAppApiResponse[D]`. Vous pouvez l'utiliser directement pour une documentation 
-Swagger propre sans devoir spécifier le type d'erreur à chaque fois.
+Pour les routes simples qui n'ont pas de schéma d'erreur personnalisé, il existe un alias de `ApiBaseResponse` préconfiguré avec `AppError` : `DefaultAppApiResponse[D]`. Vous pouvez l'utiliser directement pour une documentation Swagger propre sans devoir spécifier le type d'erreur à chaque fois.
 
 ```python
-class ReadUserApiResponse(DefaultAppApiResponse[UserResponse]):
+from app.schemas.globals.api_base_response import DefaultAppApiResponse
+from app.schemas.user_schemas import ReadUser
+
+class ReadUserApiResponse(DefaultAppApiResponse[ReadUser]):
     """Réponse standardisée pour les opérations utilisateur"""
     # Pas besoin de redéclarer les champs, ils sont hérités et typés automatiquement !
 ```
+
 Puis dans votre routeur :
 ```python
 @router.get("/users/{user_id}", response_model=ReadUserApiResponse)
-async def read_user(user_id: int, response: Response) -> ApiBaseResponse[UserResponse, AppError]:
-    service_res = user_service.get_user_profile(user_id)
+async def read_user(user_id: UUID, response: Response) -> ApiBaseResponse[ReadUser, AppError]:
+    service_res = await user_service.service_find_user_by_id(user_id)
     return service_res.to_HTTP_api_base_response(response)
 ```
 
 En résumé :
 - `response_model=ReadUserApiResponse` sert à FastAPI, à la validation de sortie et à Swagger/OpenAPI.
-- `-> ApiBaseResponse[UserResponse, AppError]` sert au typage statique Python, car c'est le type réellement retourné par `to_HTTP_api_base_response`.
+- `-> ApiBaseResponse[ReadUser, AppError]` sert au typage statique Python, car c'est le type réellement retourné par `to_HTTP_api_base_response`.
 - Annoter la route avec `-> ReadUserApiResponse` provoque généralement une erreur de typage tant que le helper ne construit pas explicitement cette sous-classe.
 
 ---
