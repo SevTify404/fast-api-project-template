@@ -133,6 +133,83 @@ celery -A app.worker.celery_app worker --loglevel=info
 
 ---
 
+## 4. Docker & Quick Start
+
+This project includes a complete Docker configuration that is **operational and ready to use** out of the box. The setup is designed for immediate use - just copy, paste, and run!
+
+### GitHub Template Repository
+This repository is configured as a **GitHub Template Repository**. You can create a new repository from this template with one click:
+- Click "Use this template" on GitHub
+- Select "Create a new repository"
+- Clone your new repository and you're ready to go!
+
+### Docker Compose Setup
+The `docker-compose.yml` file provides a complete development environment with:
+- **PostgreSQL 15** (Alpine) - Database service with health checks
+- **Redis 7** (Alpine) - Cache and message broker with persistence
+- **FastAPI Backend** - Main application server with auto-reload
+- **Celery Worker** - Background task processing (commented out by default)
+
+All services include:
+- ✅ Health checks for automatic dependency management
+- ✅ Volume persistence for data
+- ✅ Automatic restart on failure
+- ✅ Service dependencies (API waits for DB and Redis to be healthy)
+
+### Environment Configuration
+The `.env.example` file contains a **ready-to-use configuration**:
+
+```env
+ENVIRONMENT=LOCAL
+DATABASE_USER=admin
+DATABASE_PASSWORD=password
+DATABASE_TYPE=postgresql
+DATABASE_PILOT=asyncpg
+DATABASE_HOST=db:5432
+BD_OUTPUT_PORT=5433
+DATABASE_NAME=app_db
+SECRET_KEY=change-me
+API_PORT=8000
+REDIS_CACHE_PORT=6379
+REDIS_URL=redis://app_redis:6379/0
+```
+
+**This configuration is fully operational** with the provided `docker-compose.yml`. Simply:
+1. Copy `.env.example` to `.env`
+2. Run `docker compose up -d`
+3. Your application will be available at `http://localhost:8000`
+
+### Makefile Commands
+The included `Makefile` provides convenient shortcuts for common Docker operations:
+
+| Command | Description |
+|---------|-------------|
+| `make build_docker` | Build Docker images |
+| `make rebuild_docker` | Rebuild Docker images without cache |
+| `make start_docker` | Start all services in detached mode |
+| `make stop_docker` | Stop and remove all containers |
+| `make restart_api` | Restart only the API service |
+| `make migrate-up` | Run database migrations |
+| `make migrate-down` | Rollback last migration |
+| `make migrate-gen` | Generate new migration (use with: `make migrate-gen msg="your message"`) |
+
+**Example workflow:**
+```bash
+# Start everything
+make start_docker
+
+# Run migrations
+make migrate-up
+
+# Stop everything
+make stop_docker
+```
+
+> [!TIP]
+> The Makefile automatically handles user permissions on Linux/Mac (avoiding file ownership issues) and works seamlessly on Windows with Docker Desktop.
+
+---
+
 ## 📚 Documentation Language Notes
 
 All documentation files in the `docs/` directory are available in both **English** and **French**:

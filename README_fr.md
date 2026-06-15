@@ -133,6 +133,83 @@ celery -A app.worker.celery_app worker --loglevel=info
 
 ---
 
+## 4. Docker & Démarrage Rapide
+
+Ce projet inclut une configuration Docker complète qui est **opérationnelle et prête à l'emploi** dès la sortie de la boîte. La configuration est conçue pour une utilisation immédiate - il suffit de copier, coller et exécuter !
+
+### Dépôt Template GitHub
+Ce dépôt est configuré comme un **dépôt template GitHub**. Vous pouvez créer un nouveau dépôt à partir de ce template en un clic :
+- Cliquez sur "Use this template" sur GitHub
+- Sélectionnez "Create a new repository"
+- Clonez votre nouveau dépôt et vous êtes prêt à démarrer !
+
+### Configuration Docker Compose
+Le fichier `docker-compose.yml` fournit un environnement de développement complet avec :
+- **PostgreSQL 15** (Alpine) - Service de base de données avec vérifications de santé
+- **Redis 7** (Alpine) - Cache et broker de messages avec persistance
+- **Backend FastAPI** - Serveur d'application principal avec rechargement automatique
+- **Worker Celery** - Traitement des tâches en arrière-plan (commenté par défaut)
+
+Tous les services incluent :
+- ✅ Vérifications de santé pour la gestion automatique des dépendances
+- ✅ Persistance des volumes pour les données
+- ✅ Redémarrage automatique en cas d'échec
+- ✅ Dépendances entre services (l'API attend que la BD et Redis soient prêtes)
+
+### Configuration de l'Environnement
+Le fichier `.env.example` contient une **configuration prête à l'emploi** :
+
+```env
+ENVIRONMENT=LOCAL
+DATABASE_USER=admin
+DATABASE_PASSWORD=password
+DATABASE_TYPE=postgresql
+DATABASE_PILOT=asyncpg
+DATABASE_HOST=db:5432
+BD_OUTPUT_PORT=5433
+DATABASE_NAME=app_db
+SECRET_KEY=change-me
+API_PORT=8000
+REDIS_CACHE_PORT=6379
+REDIS_URL=redis://app_redis:6379/0
+```
+
+**Cette configuration est entièrement opérationnelle** avec le `docker-compose.yml` fourni. Il suffit de :
+1. Copier `.env.example` en `.env`
+2. Exécuter `docker compose up -d`
+3. Votre application sera disponible sur `http://localhost:8000`
+
+### Commandes Makefile
+Le `Makefile` inclus fournit des raccourcis pratiques pour les opérations Docker courantes :
+
+| Commande | Description |
+|----------|-------------|
+| `make build_docker` | Construire les images Docker |
+| `make rebuild_docker` | Reconstruire les images Docker sans le cache |
+| `make start_docker` | Démarrer tous les services en mode détaché |
+| `make stop_docker` | Arrêter et supprimer tous les conteneurs |
+| `make restart_api` | Redémarrer uniquement le service API |
+| `make migrate-up` | Exécuter les migrations de base de données |
+| `make migrate-down` | Annuler la dernière migration |
+| `make migrate-gen` | Générer une nouvelle migration (à utiliser avec : `make migrate-gen msg="votre message"`) |
+
+**Exemple de workflow :**
+```bash
+# Démarrer tout
+make start_docker
+
+# Exécuter les migrations
+make migrate-up
+
+# Tout arrêter
+make stop_docker
+```
+
+> [!TIP]
+> Le Makefile gère automatiquement les permissions utilisateur sur Linux/Mac (évitant les problèmes de droits de fichiers) et fonctionne parfaitement sur Windows avec Docker Desktop.
+
+---
+
 ## 📚 Notes sur les Langues de Documentation
 
 Tous les fichiers de documentation dans le dossier `docs/` sont disponibles en **français** et en **anglais** :

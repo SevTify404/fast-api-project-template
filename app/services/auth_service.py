@@ -56,11 +56,10 @@ class AuthService:
             username=login_data.username
         )
 
-        user_read = ReadUser.model_validate(db_user.data)
-
         if db_user.is_error():
             return db_user.to_service_error(service_name=self._service_name)
 
+        user_read = ReadUser.model_validate(db_user.data)
         if not verify_password(
             plain_password=login_data.password,
             hashed_password=db_user.data.password_hash,
