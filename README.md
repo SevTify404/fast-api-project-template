@@ -4,6 +4,12 @@ This project serves as a starting structure (boilerplate/template) for developin
 
 ---
 
+<div align="center">
+  <img src="https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png" alt="FastAPI Logo" width="300" />
+</div>
+
+---
+
 > **🌍 Documentation Available in Other Languages**
 > - [Français (French)](./README_fr.md)
 
