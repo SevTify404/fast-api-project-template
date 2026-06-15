@@ -131,3 +131,32 @@ class Product(Base, IntegrityMapperMixin):
         CHK_PRODUCTS_POSITIVE_PRICE: "Le prix d'un produit ne peut pas être négatif.",
     }
 ```
+
+---
+
+## 5. Import des Mod�les
+
+> [!IMPORTANT]
+> **Tous les mod�les doivent �tre import�s dans `app/db/__init__.py` via la fonction `add_all_tables()`.**
+> Ne pas exporter les mod�les depuis `app/db/models/__init__.py`.
+
+### Pourquoi ce pattern ?
+Le pattern d'import centralis� dans `app/db/__init__.py` garantit que :
+- Tous les mod�les sont charg�s au d�marrage de l'application
+- Il n'y a pas de probl�mes d'imports circulaires
+- La base de donn�es est initialis�e correctement
+
+### Comment l'impl�menter ?
+1. **Cr�er votre mod�le** dans `app/db/models/` (ex: `thread.py`)
+2. **Ajouter l'import** dans `app/db/__init__.py` :
+
+```python
+# app/db/__init__.py
+def add_all_tables():
+    from app.db.models.user import User
+    from app.db.models.session import Session
+    from app.db.models.thread import Thread
+    # Ajoutez ici tous vos nouveaux mod�les
+    
+add_all_tables()
+```
