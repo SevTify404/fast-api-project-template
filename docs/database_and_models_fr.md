@@ -134,20 +134,20 @@ class Product(Base, IntegrityMapperMixin):
 
 ---
 
-## 5. Import des Mod�les
+## 5. Import des Modèles
 
 > [!IMPORTANT]
-> **Tous les mod�les doivent �tre import�s dans `app/db/__init__.py` via la fonction `add_all_tables()`.**
-> Ne pas exporter les mod�les depuis `app/db/models/__init__.py`.
+> **Tous les modèles doivent être importés dans `app/db/__init__.py` via la fonction `add_all_tables()`.**
+> Ne pas exporter les modèles depuis `app/db/models/__init__.py`.
 
 ### Pourquoi ce pattern ?
-Le pattern d'import centralis� dans `app/db/__init__.py` garantit que :
-- Tous les mod�les sont charg�s au d�marrage de l'application
-- Il n'y a pas de probl�mes d'imports circulaires
-- La base de donn�es est initialis�e correctement
+Le pattern d'import centralisé dans `app/db/__init__.py` garantit que :
+- Tous les modèles sont chargés au démarrage de l'application
+- Il n'y a pas de problèmes d'imports circulaires
+- La base de données est initialisée correctement
 
-### Comment l'impl�menter ?
-1. **Cr�er votre mod�le** dans `app/db/models/` (ex: `thread.py`)
+### Comment l'implémenter ?
+1. **Créer votre modèle** dans `app/db/models/` (ex: `thread.py`)
 2. **Ajouter l'import** dans `app/db/__init__.py` :
 
 ```python
@@ -156,7 +156,7 @@ def add_all_tables():
     from app.db.models.user import User
     from app.db.models.session import Session
     from app.db.models.thread import Thread
-    # Ajoutez ici tous vos nouveaux mod�les
+    # Ajoutez ici tous vos nouveaux modèles
     
 add_all_tables()
 ```
