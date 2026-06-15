@@ -13,13 +13,13 @@ Ce projet sert de structure de départ (boiler-plate/template) pour le développ
 
 Pour comprendre en profondeur les différents composants de l'application et les patterns recommandés, veuillez consulter les documents suivants :
 
-- [📂 Aperçu de l'Architecture & Flux de Données](file:///home/sevtify/Projets/fast-api-project-template/app/docs/architecture_overview_fr.md) : Modèle conceptuel (Router ➔ Service ➔ Repository ➔ Cache) et cycle de vie.
-- [📂 Modèles & Base de Données](file:///home/sevtify/Projets/fast-api-project-template/app/docs/database_and_models_fr.md) : SQLAlchemy 2.0, mixin `IntegrityMapperMixin` et gestion des contraintes.
-- [📂 Gestion des Résultats & Erreurs](file:///home/sevtify/Projets/fast-api-project-template/app/docs/results_and_errors_fr.md) : Modèle de retour `GenericAppResult` et sous-classes (`CrudResult`, `ServiceResult`, `IntegrationServiceResult`).
-- [📂 Système de Cache](file:///home/sevtify/Projets/fast-api-project-template/app/docs/caching_system_fr.md) : Enregistrement et utilisation type-safe du cache Redis via la Factory.
-- [📂 Authentification & Sécurité (RBAC)](file:///home/sevtify/Projets/fast-api-project-template/app/docs/auth_and_security_fr.md) : Double cookie (Access/Refresh), authentification `HttpOnly` et dépendances de rôles.
-- [📂 Repositories & Services](file:///home/sevtify/Projets/fast-api-project-template/app/docs/repositories_and_services_fr.md) : Écriture et structuration des modules de données et de logique métier.
-- [📂 API Routers & Middlewares](file:///home/sevtify/Projets/fast-api-project-template/app/docs/routers_and_schemas_fr.md) : Configuration Swagger Premium, validation Pydantic et middlewares de diagnostic.
+- [📂 Aperçu de l'Architecture & Flux de Données](./docs/architecture_overview_fr.md) : Modèle conceptuel (Router ➔ Service ➔ Repository ➔ Cache) et cycle de vie.
+- [📂 Modèles & Base de Données](./docs/database_and_models_fr.md) : SQLAlchemy 2.0, mixin `IntegrityMapperMixin` et gestion des contraintes.
+- [📂 Gestion des Résultats & Erreurs](./docs/results_and_errors_fr.md) : Modèle de retour `GenericAppResult` et sous-classes (`CrudResult`, `ServiceResult`, `IntegrationServiceResult`).
+- [📂 Système de Cache](./docs/caching_system_fr.md) : Enregistrement et utilisation type-safe du cache Redis via la Factory.
+- [📂 Authentification & Sécurité (RBAC)](./docs/auth_and_security_fr.md) : Double cookie (Access/Refresh), authentification `HttpOnly` et dépendances de rôles.
+- [📂 Repositories & Services](./docs/repositories_and_services_fr.md) : Écriture et structuration des modules de données et de logique métier.
+- [📂 API Routers & Middlewares](./docs/routers_and_schemas_fr.md) : Configuration Swagger Premium, validation Pydantic et middlewares de diagnostic.
 
 ---
 
@@ -135,7 +135,7 @@ celery -A app.worker.celery_app worker --loglevel=info
 
 ## 📚 Notes sur les Langues de Documentation
 
-Tous les fichiers de documentation dans le dossier `app/docs/` sont disponibles en **français** et en **anglais** :
+Tous les fichiers de documentation dans le dossier `docs/` sont disponibles en **français** et en **anglais** :
 - Les versions anglaises ont le suffixe `_en.md`
 - Les versions françaises ont le suffixe `_fr.md`
 

@@ -13,13 +13,13 @@ This project serves as a starting structure (boilerplate/template) for developin
 
 To deeply understand the different components of the application and recommended patterns, please refer to the following documents:
 
-- [📂 Architecture Overview & Data Flow - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/architecture_overview_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/architecture_overview_fr.md) : Conceptual model (Router ➔ Service ➔ Repository ➔ Cache) and lifecycle.
-- [📂 Database & Models - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/database_and_models_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/database_and_models_fr.md) : SQLAlchemy 2.0, `IntegrityMapperMixin` mixin, and constraint management.
-- [📂 Results & Errors Management - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/results_and_errors_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/results_and_errors_fr.md) : `GenericAppResult` return model and subclasses (`CrudResult`, `ServiceResult`, `IntegrationServiceResult`).
-- [📂 Cache System - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/caching_system_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/caching_system_fr.md) : Type-safe Redis cache registration and usage via Factory.
-- [📂 Authentication & Security (RBAC) - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/auth_and_security_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/auth_and_security_fr.md) : Dual cookie (Access/Refresh), `HttpOnly` authentication, and role dependencies.
-- [📂 Repositories & Services - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/repositories_and_services_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/repositories_and_services_fr.md) : Data and business logic modules writing and structuring.
-- [📂 API Routers & Middlewares - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/routers_and_schemas_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/routers_and_schemas_fr.md) : Premium Swagger configuration, Pydantic validation, and diagnostic middlewares.
+- [📂 Architecture Overview & Data Flow - EN](./docs/architecture_overview_en.md) / [FR](./docs/architecture_overview_fr.md) : Conceptual model (Router ➔ Service ➔ Repository ➔ Cache) and lifecycle.
+- [📂 Database & Models - EN](./docs/database_and_models_en.md) / [FR](./docs/database_and_models_fr.md) : SQLAlchemy 2.0, `IntegrityMapperMixin` mixin, and constraint management.
+- [📂 Results & Errors Management - EN](./docs/results_and_errors_en.md) / [FR](./docs/results_and_errors_fr.md) : `GenericAppResult` return model and subclasses (`CrudResult`, `ServiceResult`, `IntegrationServiceResult`).
+- [📂 Cache System - EN](./docs/caching_system_en.md) / [FR](./docs/caching_system_fr.md) : Type-safe Redis cache registration and usage via Factory.
+- [📂 Authentication & Security (RBAC) - EN](./docs/auth_and_security_en.md) / [FR](./docs/auth_and_security_fr.md) : Dual cookie (Access/Refresh), `HttpOnly` authentication, and role dependencies.
+- [📂 Repositories & Services - EN](./docs/repositories_and_services_en.md) / [FR](./docs/repositories_and_services_fr.md) : Data and business logic modules writing and structuring.
+- [📂 API Routers & Middlewares - EN](./docs/routers_and_schemas_en.md) / [FR](./docs/routers_and_schemas_fr.md) : Premium Swagger configuration, Pydantic validation, and diagnostic middlewares.
 
 ---
 
@@ -135,7 +135,7 @@ celery -A app.worker.celery_app worker --loglevel=info
 
 ## 📚 Documentation Language Notes
 
-All documentation files in the `app/docs/` directory are available in both **English** and **French**:
+All documentation files in the `docs/` directory are available in both **English** and **French**:
 - English versions have the `_en.md` suffix
 - French versions have the `_fr.md` suffix
 
