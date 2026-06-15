@@ -6,6 +6,11 @@ Le code source associé à ce système est localisé dans [app/globals/app_resul
 
 ---
 
+> **📄 Documentation Available in English**
+> An English version of this document is available: [results_and_errors_en.md](./results_and_errors_en.md)
+
+---
+
 ## 1. Principes de base
 
 Toutes les réponses internes de l'application héritent d'une classe de base générique : `GenericAppResult[D, E]`.

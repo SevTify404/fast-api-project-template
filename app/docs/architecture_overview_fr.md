@@ -4,6 +4,11 @@ Ce document décrit les choix d'architecture, la vision globale et le paradigme 
 
 ---
 
+> **📄 Documentation Available in English**
+> An English version of this document is available: [architecture_overview_en.md](./architecture_overview_en.md)
+
+---
+
 ## 1. Vision et Paradigme Global
 Le projet template est basé sur une **architecture en couches** (n-tier) guidée par des principes de **Clean Code** et une **séparation stricte des responsabilités**. 
 

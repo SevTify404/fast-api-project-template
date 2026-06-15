@@ -1,127 +1,142 @@
-# Template Projet FastAPI - Clean Architecture
+# FastAPI Project Template - Clean Architecture
 
-Ce projet sert de structure de départ (boiler-plate/template) pour le développement d'applications web et d'API REST résilientes, performantes et scalables avec FastAPI. Il met en application une séparation stricte des responsabilités (Clean Architecture) et un typage rigoureux à tous les niveaux.
-
----
-
-## 1. Index de la Documentation Détaillée
-
-Pour comprendre en profondeur les différents composants de l'application et les patterns recommandés, veuillez consulter les documents suivants :
-
-- [📂 Aperçu de l'Architecture & Flux de Données](file:///home/sevtify/Projets/fast-api-project-template/app/docs/architecture_overview.md) : Modèle conceptuel (Router ➔ Service ➔ Repository ➔ Cache) et cycle de vie.
-- [📂 Modèles & Base de Données](file:///home/sevtify/Projets/fast-api-project-template/app/docs/database_and_models.md) : SQLAlchemy 2.0, mixin `IntegrityMapperMixin` et gestion des contraintes.
-- [📂 Gestion des Résultats & Erreurs](file:///home/sevtify/Projets/fast-api-project-template/app/docs/results_and_errors.md) : Modèle de retour `GenericAppResult` et sous-classes (`CrudResult`, `ServiceResult`, `IntegrationServiceResult`).
-- [📂 Système de Cache](file:///home/sevtify/Projets/fast-api-project-template/app/docs/caching_system.md) : Enregistrement et utilisation type-safe du cache Redis via la Factory.
-- [📂 Authentification & Sécurité (RBAC)](file:///home/sevtify/Projets/fast-api-project-template/app/docs/auth_and_security.md) : Double cookie (Access/Refresh), authentification `HttpOnly` et dépendances de rôles.
-- [📂 Repositories & Services](file:///home/sevtify/Projets/fast-api-project-template/app/docs/repositories_and_services.md) : Écriture et structuration des modules de données et de logique métier.
-- [📂 API Routers & Middlewares](file:///home/sevtify/Projets/fast-api-project-template/app/docs/routers_and_schemas.md) : Configuration Swagger Premium, validation Pydantic et middlewares de diagnostic.
+This project serves as a starting structure (boilerplate/template) for developing resilient, high-performance, and scalable web applications and REST APIs with FastAPI. It implements a strict separation of responsibilities (Clean Architecture) and rigorous typing at all levels.
 
 ---
 
-## 2. Workflow de Développement (Ajout d'une fonctionnalité)
+> **🌍 Documentation Available in Other Languages**
+> - [Français (French)](./README_fr.md)
 
-Lors de l'ajout d'une nouvelle entité dans l'application (ex: un produit `Product`), vous devez suivre ce cycle étape par étape pour respecter le paradigme du template :
+---
+
+## 1. Detailed Documentation Index
+
+To deeply understand the different components of the application and recommended patterns, please refer to the following documents:
+
+- [📂 Architecture Overview & Data Flow - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/architecture_overview_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/architecture_overview_fr.md) : Conceptual model (Router ➔ Service ➔ Repository ➔ Cache) and lifecycle.
+- [📂 Database & Models - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/database_and_models_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/database_and_models_fr.md) : SQLAlchemy 2.0, `IntegrityMapperMixin` mixin, and constraint management.
+- [📂 Results & Errors Management - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/results_and_errors_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/results_and_errors_fr.md) : `GenericAppResult` return model and subclasses (`CrudResult`, `ServiceResult`, `IntegrationServiceResult`).
+- [📂 Cache System - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/caching_system_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/caching_system_fr.md) : Type-safe Redis cache registration and usage via Factory.
+- [📂 Authentication & Security (RBAC) - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/auth_and_security_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/auth_and_security_fr.md) : Dual cookie (Access/Refresh), `HttpOnly` authentication, and role dependencies.
+- [📂 Repositories & Services - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/repositories_and_services_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/repositories_and_services_fr.md) : Data and business logic modules writing and structuring.
+- [📂 API Routers & Middlewares - EN](file:///home/sevtify/Projets/fast-api-project-template/app/docs/routers_and_schemas_en.md) / [FR](file:///home/sevtify/Projets/fast-api-project-template/app/docs/routers_and_schemas_fr.md) : Premium Swagger configuration, Pydantic validation, and diagnostic middlewares.
+
+---
+
+## 2. Development Workflow (Adding a Feature)
+
+When adding a new entity to the application (e.g., a `Product`), you must follow this step-by-step cycle to respect the template paradigm:
 
 ```mermaid
 graph TD
-    A[1. Modèle BD & Contraintes] --> B[2. Import tables & Migration Alembic]
-    B --> C[3. Schémas Pydantic]
+    A[1. Database Model & Constraints] --> B[2. Import tables & Alembic Migration]
+    B --> C[3. Pydantic Schemas]
     C --> D[4. Repository & CRUD]
-    D --> E[5. Définition Clés de Cache & Cacher]
-    E --> F[6. Service Métier]
-    F --> G[7. Router & Enregistrement API]
+    D --> E[5. Cache Keys Definition & Cacher]
+    E --> F[6. Business Service]
+    F --> G[7. Router & API Registration]
 ```
 
-### Étape 1 : Créer le Modèle de Base de Données
-Créez le fichier de modèle dans `app/db/models/product.py`. 
-- Héritez de `Base` (qui intègre `MappedAsDataclass`) et de `IntegrityMapperMixin`.
-- Définissez toutes les contraintes de table (uniques, clés étrangères, checks) sous forme de constantes explicites en haut du fichier.
-- Renseignez le dictionnaire `ERROR_MESSAGES` mappant les contraintes SQL aux messages d'erreur utilisateurs.
-- Pour les colonnes automatiques (ID, timestamps, relations), utilisez `init=False`.
+### Step 1: Create the Database Model
+Create the model file in `app/db/models/product.py`.
+- Inherit from `Base` (which integrates `MappedAsDataclass`) and `IntegrityMapperMixin`.
+- Define all table constraints (uniques, foreign keys, checks) as explicit constants at the top of the file.
+- Fill in the `ERROR_MESSAGES` dictionary mapping SQL constraints to user error messages.
+- For automatic columns (ID, timestamps, relationships), use `init=False`.
 
-### Étape 2 : Déclarer la Table & Générer la Migration
-1. Importez votre modèle au sein de la fonction `add_all_tables()` dans [app/db/__init__.py](file:///home/sevtify/Projets/fast-api-project-template/app/db/__init__.py) pour qu'Alembic puisse le détecter :
+### Step 2: Declare the Table & Generate Migration
+1. Import your model within the `add_all_tables()` function in [app/db/__init__.py](file:///home/sevtify/Projets/fast-api-project-template/app/db/__init__.py) so Alembic can detect it:
    ```python
    def add_all_tables():
        from app.db.models.user import User
        from app.db.models.session import Session
        from app.db.models.product import Product  # <-- IMPORT
    ```
-2. Générez le fichier de migration SQL :
+2. Generate the SQL migration file:
    ```bash
    alembic revision --autogenerate -m "Create product table"
    ```
-3. Appliquez la migration sur votre base de données locale :
+3. Apply the migration to your local database:
    ```bash
    alembic upgrade head
    ```
 
-### Étape 3 : Définir les Schémas Pydantic
-Dans le dossier `app/schemas/`, créez `product_schemas.py` :
-- Créez les schémas de requêtes (ex: `CreateProduct`, `UpdateProduct`).
-- Créez le schéma de sortie typé (ex: `ReadProduct` avec `from_attributes = True`).
-- Créez l'enveloppe de réponse API en héritant de `DefaultAppApiResponse` (ex: `ProductInfos(DefaultAppApiResponse[ReadProduct])`) pour générer une documentation Swagger premium.
+### Step 3: Define Pydantic Schemas
+In the `app/schemas/` folder, create `product_schemas.py`:
+- Create request schemas (e.g., `CreateProduct`, `UpdateProduct`).
+- Create the typed output schema (e.g., `ReadProduct` with `from_attributes = True`).
+- Create the API response wrapper by inheriting from `DefaultAppApiResponse` (e.g., `ProductInfos(DefaultAppApiResponse[ReadProduct])`) for premium Swagger documentation.
 
-### Étape 4 : Développer le Repository
-Créez le fichier de repository dans `app/repositories/product_repository.py`.
-- Déclarez une classe décorée de `@dataclass` recevant `db: AsyncSession`.
-- Implémentez les méthodes CRUD en enveloppant les requêtes dans un bloc `try/except`.
-- Interceptez les erreurs en redirigeant les exceptions vers `RepositoriesUtils.traiter_errors_en_global` en lui passant le modèle de l'entité.
-- Retournez toujours un objet `CrudResult` (ou `DefaultAppCrudResult`).
+### Step 4: Develop the Repository
+Create the repository file in `app/repositories/product_repository.py`.
+- Declare a class decorated with `@dataclass` receiving `db: AsyncSession`.
+- Implement CRUD methods by wrapping queries in a `try/except` block.
+- Intercept errors by redirecting exceptions to `RepositoriesUtils.traiter_errors_en_global` passing the entity model.
+- Always return a `CrudResult` object (or `DefaultAppCrudResult`).
 
-### Étape 5 : Configurer le Cache
-1. Définissez le motif de clé de cache dans `BaseCacheEntity` et `AvailableCacheKeys` (dans [app/cache/helpers/availables.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/availables.py)).
-2. Déclarez la clé dans `CacheKeysFactory` (dans [app/cache/helpers/keys_factory.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/keys_factory.py)) avec son nombre de placeholders.
-3. Créez une classe de cache dédiée `ProductCache` dans `app/cache/product_cache.py` pour isoler les accès Redis.
+### Step 5: Configure Cache
+1. Define the cache key pattern in `BaseCacheEntity` and `AvailableCacheKeys` (in [app/cache/helpers/availables.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/availables.py)).
+2. Declare the key in `CacheKeysFactory` (in [app/cache/helpers/keys_factory.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/keys_factory.py)) with its number of placeholders.
+3. Create a dedicated cache class `ProductCache` in `app/cache/product_cache.py` to isolate Redis accesses.
 
-### Étape 6 : Coder le Service Métier
-Créez le fichier de service dans `app/services/product_service.py`.
-- Prenez `db: AsyncSession` et `cache: CacheWrapper` dans le constructeur `__init__`.
-- Instanciez de manière interne `ProductRepository` et `ProductCache`.
-- Implémentez la logique métier : lisez le cache d'abord, interrogez le repository en cas de cache-miss, enregistrez la donnée lue dans le cache, et retournez un `ServiceResult` (ou `DefaultAppServiceResult`).
-- Propager les échecs du repository au service via `repo_res.to_service_error(service_name=self._service_name)`.
+### Step 6: Code the Business Service
+Create the service file in `app/services/product_service.py`.
+- Take `db: AsyncSession` and `cache: CacheWrapper` in the `__init__` constructor.
+- Internally instantiate `ProductRepository` and `ProductCache`.
+- Implement business logic: read cache first, query repository on cache-miss, save read data in cache, and return a `ServiceResult` (or `DefaultAppServiceResult`).
+- Propagate repository failures to the service via `repo_res.to_service_error(service_name=self._service_name)`.
 
-### Étape 7 : Créer et Enregistrer le Router API
-Créez le fichier de routeur dans `app/routers/v1/product_router.py`.
-- Créez l'instance `APIRouter` avec les tags appropriés.
-- Injectez le service avec `Depends(get_product_service)`.
-- Configurez `response_model` de la route sur votre enveloppe concrète (ex: `response_model=ProductInfos`).
-- Spécifiez l'annotation de retour `-> ApiBaseResponse[ReadProduct, AppError]`.
-- Enregistrez le nouveau routeur dans le routeur principal [app/routers/v1/base_router.py](file:///home/sevtify/Projets/fast-api-project-template/app/routers/v1/base_router.py) via `v1_api_router.include_router(product_router)`.
+### Step 7: Create and Register the API Router
+Create the router file in `app/routers/v1/product_router.py`.
+- Create the `APIRouter` instance with appropriate tags.
+- Inject the service with `Depends(get_product_service)`.
+- Set the route's `response_model` to your concrete wrapper (e.g., `response_model=ProductInfos`).
+- Specify the return annotation `-> ApiBaseResponse[ReadProduct, AppError]`.
+- Register the new router in the main router [app/routers/v1/base_router.py](file:///home/sevtify/Projets/fast-api-project-template/app/routers/v1/base_router.py) via `v1_api_router.include_router(product_router)`.
 
 ---
 
-## 3. Lancement du Projet en Local
+## 3. Running the Project Locally
 
-### Prérequis
+### Prerequisites
 - Python 3.11+
-- Base de données PostgreSQL (ou dockerisée)
-- Redis (pour le cache et Celery)
+- PostgreSQL database (or Dockerized)
+- Redis (for cache and Celery)
 
-### Démarrage Rapide
+### Quick Start
 
-1. **Cloner le projet et préparer l'environnement** :
+1. **Clone the project and prepare the environment**:
    ```bash
    python -m venv .venv
    source .venv/bin/activate
    pip install -r requirements.txt
    ```
-2. **Configurer les variables d'environnement** :
-   Copiez le fichier `.env.example` vers `.env` et ajustez les paramètres d'accès à PostgreSQL et Redis.
-3. **Lancer les migrations de base de données** :
+2. **Configure environment variables**:
+   Copy the `.env.example` file to `.env` and adjust the PostgreSQL and Redis access parameters.
+3. **Run database migrations**:
    ```bash
    alembic upgrade head
    ```
-4. **Lancer le serveur de développement** :
+4. **Start the development server**:
    ```bash
-   # Utilise uvicorn sous le capot pour exécuter l'application sur le port configuré
+   # Uses uvicorn under the hood to run the application on the configured port
    python app/main.py
    ```
-5. **Accéder à la documentation API** :
-   Ouvrez votre navigateur sur [http://localhost:8000/docs](http://localhost:8000/docs) pour visualiser le Swagger interactif.
+5. **Access API documentation**:
+   Open your browser to [http://localhost:8000/docs](http://localhost:8000/docs) to view the interactive Swagger.
 
-### Démarrage des Workers Celery (Tâches en arrière-plan)
-Si votre projet utilise Celery pour des traitements asynchrones, lancez le worker Celery depuis la racine du projet :
+### Starting Celery Workers (Background Tasks)
+If your project uses Celery for asynchronous processing, start the Celery worker from the project root:
 ```bash
 celery -A app.worker.celery_app worker --loglevel=info
 ```
+
+---
+
+## 📚 Documentation Language Notes
+
+All documentation files in the `app/docs/` directory are available in both **English** and **French**:
+- English versions have the `_en.md` suffix
+- French versions have the `_fr.md` suffix
+
+Each documentation file contains a notice at the top indicating the availability of the other language version.

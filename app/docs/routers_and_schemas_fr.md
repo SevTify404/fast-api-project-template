@@ -4,6 +4,11 @@ Ce document décrit le fonctionnement de la couche API, la configuration des ré
 
 ---
 
+> **📄 Documentation Available in English**
+> An English version of this document is available: [routers_and_schemas_en.md](./routers_and_schemas_en.md)
+
+---
+
 ## 1. Routeurs & Dépendances de Services
 
 Les routeurs FastAPI reçoivent les requêtes, valident les données entrantes et délèguent immédiatement le travail aux services concernés.

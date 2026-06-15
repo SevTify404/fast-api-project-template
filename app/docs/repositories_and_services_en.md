@@ -1,21 +1,26 @@
-# Implémentation des Repositories & Services
+# Implementation of Repositories & Services
 
-Ce document explique les bonnes pratiques pour structurer la couche d'accès aux données (Repository) et la couche de logique métier (Service).
+This document explains best practices for structuring the data access layer (Repository) and the business logic layer (Service).
 
 ---
 
-## 1. La Couche Repository (Accès Données)
+> **📄 Documentation Available in French**
+> A French version of this document is available: [repositories_and_services_fr.md](./repositories_and_services_fr.md)
 
-Le rôle exclusif d'un Repository est d'exécuter des requêtes SQL et de retourner le résultat sous la forme d'un objet `CrudResult`.
+---
 
-### 1.1. Conception et Dépendances
-- **`@dataclass`** : Les repositories sont décorés avec `@dataclass` pour simplifier l'injection de la session de base de données asynchrone `db: AsyncSession`.
-- **Gestion Globale des Exceptions** : Toutes les requêtes sont enveloppées dans un bloc `try/except`. Les erreurs sont redirigées vers [RepositoriesUtils](file:///home/sevtify/Projets/fast-api-project-template/app/repositories/helpers/repositories_utils.py) pour assurer :
-  1. Le rollback automatique de la session de base de données (`await session.rollback()`) pour éviter les états transactionnels corrompus.
-  2. La traduction automatique des erreurs d'intégrité (via le mixin de modèle `IntegrityMapperMixin`).
-  3. L'anonymisation et l'enregistrement de trace (logging) pour les erreurs internes (HTTP 500).
+## 1. Repository Layer (Data Access)
 
-### Squelette Standard d'un Repository :
+The exclusive role of a Repository is to execute SQL queries and return the result as a `CrudResult` object.
+
+### 1.1. Design and Dependencies
+- **`@dataclass`**: Repositories are decorated with `@dataclass` to simplify the injection of the async database session `db: AsyncSession`.
+- **Global Exception Handling**: All queries are wrapped in a `try/except` block. Errors are redirected to [RepositoriesUtils](file:///home/sevtify/Projets/fast-api-project-template/app/repositories/helpers/repositories_utils.py) to ensure:
+  1. Automatic rollback of the database session (`await session.rollback()`) to prevent corrupted transactional states.
+  2. Automatic translation of integrity errors (via the model's `IntegrityMapperMixin`).
+  3. Anonymization and logging of internal errors (HTTP 500).
+
+### Standard Repository Skeleton:
 ```python
 # app/repositories/product_repository.py
 from dataclasses import dataclass
@@ -38,7 +43,7 @@ class ProductRepository:
     db: AsyncSession
 
     async def insert_product(self, product_data: CreateProduct) -> DefaultAppCrudResult[Product]:
-        """Fonction pour insérer un produit en base de données."""
+        """Function to insert a product into the database."""
         try:
             product = Product(
                 code=product_data.code,
@@ -49,29 +54,29 @@ class ProductRepository:
             await self.db.commit()
             await self.db.refresh(product)
             
-            logger.info("Produit ajouté avec succès !")
+            logger.info("Product added successfully!")
             return CrudResult.crud_success(
                 data=product, status_code=status.HTTP_201_CREATED
             )
         except Exception as e:
-            # Gère les IntegrityError (ex: code doublon) et rollback automatiquement la session
+            # Handles IntegrityError (e.g., duplicate code) and automatically rolls back the session
             return await RepositoriesUtils.traiter_errors_en_global(
                 e, self.db, logger, Product
             )
 
     async def get_product_by_code(self, code: str) -> DefaultAppCrudResult[Product]:
-        """Fonction pour récupérer un produit par son code unique."""
+        """Function to retrieve a product by its unique code."""
         try:
             stmt = select(Product).where(Product.code == code)
             result = await self.db.execute(stmt)
             product = result.scalar_one_or_none()
 
             if product is None:
-                logger.info("Produit non trouvé")
+                logger.info("Product not found")
                 return CrudResult.crud_failure(
                     AppError(
                         error_type=AppErrorType.NOT_FOUND,
-                        error_message="Produit inexistant",
+                        error_message="Product does not exist",
                     ),
                     status_code=status.HTTP_404_NOT_FOUND,
                 )
@@ -85,16 +90,16 @@ class ProductRepository:
 
 ---
 
-## 2. La Couche Service (Logique Métier)
+## 2. Service Layer (Business Logic)
 
-Un Service orchestre la logique métier. Il coordonne les lectures et écritures en base de données, la mise en cache et les calculs métier.
+A Service orchestrates business logic. It coordinates database reads and writes, caching, and business calculations.
 
-### 2.1. Conception et Dépendances
-- **Injection Directe** : Le constructeur d'un service reçoit en paramètres les connexions brutes (`db: AsyncSession`, `cache: CacheWrapper`).
-- **Instanciation Interne** : Le service instancie lui-même ses Repositories et Cachers internes. Cela évite d'exposer la plomberie d'accès aux données ou au cache dans les routeurs HTTP.
-- **Conversion d'Erreurs (`to_service_error`)** : Les erreurs retournées par la couche Repository (`CrudResult` d'échec) sont propagées proprement au service en appelant `.to_service_error(service_name=self._service_name)`. Le code HTTP et la structure de l'erreur sont ainsi intégralement préservés.
+### 2.1. Design and Dependencies
+- **Direct Injection**: The service constructor receives raw connections (`db: AsyncSession`, `cache: CacheWrapper`) as parameters.
+- **Internal Instantiation**: The service itself instantiates its internal Repositories and Cachers. This avoids exposing the data access or cache plumbing in HTTP routers.
+- **Error Conversion (`to_service_error`)**: Errors returned by the Repository layer (`CrudResult` failure) are properly propagated to the service by calling `.to_service_error(service_name=self._service_name)`. The HTTP code and error structure are thus fully preserved.
 
-### Squelette Standard d'un Service :
+### Standard Service Skeleton:
 ```python
 # app/services/product_service.py
 from logging import getLogger
@@ -113,29 +118,29 @@ logger = getLogger(__name__)
 class ProductService:
     def __init__(self, db: AsyncSession, cache: CacheWrapper):
         self.__db = db
-        # Instanciation interne des sous-dépendances
+        # Internal instantiation of sub-dependencies
         self.__product_cache = ProductCache(cache)
         self.__product_repo = ProductRepository(self.__db)
         self._service_name = "PRODUCT_SERVICE"
 
     async def service_find_product_by_code(self, code: str) -> DefaultAppServiceResult[ReadProduct]:
-        """Récupère un produit (vérifie le cache en premier, puis la base de données)."""
+        """Retrieves a product (checks cache first, then database)."""
         
-        # 1. Tentative de lecture depuis le cache Redis
+        # 1. Attempt to read from Redis cache
         product_cached = await self.__product_cache.get_product_from_cache(code)
         if product_cached is not None:
             return ServiceResult.service_success(data=product_cached)
 
-        # 2. Si absent du cache, lecture en base de données
+        # 2. If not in cache, read from database
         product_db = await self.__product_repo.get_product_by_code(code)
         if product_db.is_error():
-            # Conversion et propagation propre de l'erreur
+            # Conversion and proper propagation of the error
             return product_db.to_service_error(service_name=self._service_name)
 
-        # 3. Validation et formatage via schéma Pydantic
+        # 3. Validation and formatting via Pydantic schema
         read_product = ReadProduct.model_validate(product_db.data)
 
-        # 4. Enregistrement asynchrone dans le cache Redis
+        # 4. Async storage in Redis cache
         await self.__product_cache.set_product_in_cache(
             product=read_product, ttl=CacheDuration.TWENTY_MINUTES
         )
@@ -146,7 +151,7 @@ class ProductService:
         )
 
     async def service_create_product(self, product_data: CreateProduct) -> DefaultAppServiceResult[ReadProduct]:
-        """Crée un produit, l'ajoute en base de données et peuple le cache."""
+        """Creates a product, adds it to the database, and populates the cache."""
         
         product_db = await self.__product_repo.insert_product(product_data=product_data)
         if product_db.is_error():
@@ -154,7 +159,7 @@ class ProductService:
 
         read_product = ReadProduct.model_validate(product_db.data)
 
-        # Peuple le cache immédiatement après création
+        # Populate cache immediately after creation
         await self.__product_cache.set_product_in_cache(
             product=read_product, ttl=CacheDuration.TWENTY_MINUTES
         )

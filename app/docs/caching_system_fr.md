@@ -4,6 +4,11 @@ Ce document détaille l'architecture du cache de l'application, l'enregistrement
 
 ---
 
+> **📄 Documentation Available in English**
+> An English version of this document is available: [caching_system_en.md](./caching_system_en.md)
+
+---
+
 ## 1. Principes de Conception
 Pour éviter d'avoir des clés de cache codées en dur ("hardcoded") éparpillées dans l'application, ce qui amène à des doublons et des risques de collisions, le template centralise tout dans des structures type-safe :
 1. **`BaseCacheEntity`** (définie dans [app/cache/helpers/availables.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/availables.py)) : Chaînes de format de base (avec placeholders comme `{id}`).

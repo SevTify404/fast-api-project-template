@@ -4,6 +4,11 @@ Ce document décrit le fonctionnement du système de sécurité, l'authentificat
 
 ---
 
+> **📄 Documentation Available in English**
+> An English version of this document is available: [auth_and_security_en.md](./auth_and_security_en.md)
+
+---
+
 ## 1. Stratégie à Double Cookie (Access & Refresh)
 
 Pour maximiser la sécurité tout en offrant une expérience utilisateur fluide, le template utilise deux cookies distincts stockés de manière sécurisée côté client :

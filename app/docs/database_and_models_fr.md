@@ -4,6 +4,11 @@ Ce document détaille les règles de modélisation avec SQLAlchemy 2.0, l'usage 
 
 ---
 
+> **📄 Documentation Available in English**
+> An English version of this document is available: [database_and_models_en.md](./database_and_models_en.md)
+
+---
+
 ## 1. Modélisation de Base (SQLAlchemy 2.0 Moderne)
 
 Le template utilise la base déclarative moderne avec support automatique des **dataclasses** Python (`MappedAsDataclass` et `DeclarativeBase`).
