@@ -12,10 +12,10 @@ This document details the application's cache architecture, centralized cache ke
 ## 1. Design Principles
 
 To avoid having hardcoded cache keys scattered throughout the application, which leads to duplicates and collision risks, the template centralizes everything in type-safe structures:
-1. **`BaseCacheEntity`** (defined in [app/cache/helpers/availables.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/availables.py)): Base format strings (with placeholders like `{id}`).
-2. **`AvailableCacheKeys`** (in [availables.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/availables.py)): Enum listing all exposed keys.
-3. **`CacheKey`** (defined in [app/cache/base/cache_key.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/base/cache_key.py)): Represents a cache key with its dynamic parameters.
-4. **`CacheKeysFactory`** (defined in [app/cache/helpers/keys_factory.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/keys_factory.py)): Provides the `CacheKey` instance preconfigured with a guaranteed unique number of placeholders.
+1. **`BaseCacheEntity`** (defined in [app/cache/helpers/availables.py](../app/cache/helpers/availables.py)): Base format strings (with placeholders like `{id}`).
+2. **`AvailableCacheKeys`** (in [availables.py](../app/cache/helpers/availables.py)): Enum listing all exposed keys.
+3. **`CacheKey`** (defined in [app/cache/base/cache_key.py](../app/cache/base/cache_key.py)): Represents a cache key with its dynamic parameters.
+4. **`CacheKeysFactory`** (defined in [app/cache/helpers/keys_factory.py](../app/cache/helpers/keys_factory.py)): Provides the `CacheKey` instance preconfigured with a guaranteed unique number of placeholders.
 
 ---
 
@@ -24,7 +24,7 @@ To avoid having hardcoded cache keys scattered throughout the application, which
 When adding a new entity to cache (e.g., `Product`), strictly follow these 3 steps:
 
 ### Step 1: Register the Entity Format
-In the `BaseCacheEntity` class of the file [app/cache/helpers/availables.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/availables.py):
+In the `BaseCacheEntity` class of the file [app/cache/helpers/availables.py](../app/cache/helpers/availables.py):
 ```python
 class BaseCacheEntity:
     USER = "entity:user:{id}"
@@ -42,7 +42,7 @@ class AvailableCacheKeys(str, Enum):
 ```
 
 ### Step 3: Configure and Map the Key in the Factory
-In the `CacheKeysFactory` class of the file [app/cache/helpers/keys_factory.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/helpers/keys_factory.py), add the key to the private `__cache_keys_mapping` dictionary, indicating the required number of placeholders (here `1` for `{code}`):
+In the `CacheKeysFactory` class of the file [app/cache/helpers/keys_factory.py](../app/cache/helpers/keys_factory.py), add the key to the private `__cache_keys_mapping` dictionary, indicating the required number of placeholders (here `1` for `{code}`):
 ```python
     __cache_keys_mapping: dict[AvailableCacheKeys, CacheKey] = {
         AvailableCacheKeys.USER_OBJECT: CacheKey.new_key(
@@ -63,7 +63,7 @@ In the `CacheKeysFactory` class of the file [app/cache/helpers/keys_factory.py](
 
 > [!IMPORTANT]
 > **Never perform cache operations (direct read/write) in Services or Repositories.**
-> You must create a dedicated management class (a "Cacher") in the `app/cache/` package (like [app/cache/user_cache.py](file:///home/sevtify/Projets/fast-api-project-template/app/cache/user_cache.py)).
+> You must create a dedicated management class (a "Cacher") in the `app/cache/` package (like [app/cache/user_cache.py](../app/cache/user_cache.py)).
 
 This class encapsulates the `CacheWrapper` and exposes explicit methods for saving, reading, and especially **easily invalidating** cache data.
 
@@ -127,7 +127,7 @@ class ProductCache:
 
 ## 4. Advanced Features of `CacheWrapper`
 
-The [CacheWrapper](file:///home/sevtify/Projets/fast-api-project-template/app/cache/base/cache_wrapper.py) provides complex operations:
+The [CacheWrapper](../app/cache/base/cache_wrapper.py) provides complex operations:
 - **Automatic Serialization**: Automatic handling of dictionaries, lists, and Pydantic models (`save_pydantic_model_in_cache`).
 - **Atomic Operations**: `incr_in_cache` and `decr_in_cache` for safe incrementation.
 - **Sets**: `add_to_a_set` and `get_from_a_set` for manipulating unique set structures.

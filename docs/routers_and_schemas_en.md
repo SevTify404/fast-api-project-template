@@ -73,7 +73,7 @@ The HTTP request processing cycle is secured by middlewares that intercept reque
 ### 3.1. Uncaught Exception Handling (`exception_handler_middleware.py`)
 This middleware intercepts all uncaught Python exceptions within the application (which would otherwise appear as raw errors or empty responses):
 - Logs the complete error traceback via `logger.exception`.
-- Translates and returns a standardized HTTP 500 JSON response respecting the [DefaultAppApiResponse](file:///home/sevtify/Projets/fast-api-project-template/app/schemas/globals/api_base_response.py) schema, containing the `UNKNOWN_ERROR` error with the user message: *"An internal error occurred. Please try again later."*
+- Translates and returns a standardized HTTP 500 JSON response respecting the [DefaultAppApiResponse](../app/schemas/globals/api_base_response.py) schema, containing the `UNKNOWN_ERROR` error with the user message: *"An internal error occurred. Please try again later."*
 
 ### 3.2. Logging and Slow Request Alert (`request_logging_middleware.py`)
 This middleware traces each incoming and outgoing HTTP request.

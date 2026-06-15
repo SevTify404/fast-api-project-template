@@ -2,7 +2,7 @@
 
 Ce document explique le fonctionnement du système de retour standardisé de l'application et comment l'utiliser pour gérer à la fois les données de succès et les erreurs de manière type-safe dans les couches **Repository**, **Service**, **Integration** et **API**.
 
-Le code source associé à ce système est localisé dans [app/globals/app_result.py](file:///home/sevtify/Projets/fast-api-project-template/app/globals/app_result.py).
+Le code source associé à ce système est localisé dans [app/globals/app_result.py](../app/globals/app_result.py).
 
 ---
 
@@ -18,15 +18,15 @@ Toutes les réponses internes de l'application héritent d'une classe de base g�
 - **`E`** représente le type d'erreur retourné en cas d'**échec** (par défaut, `AppError`).
 
 Le système fournit trois classes spécialisées pour chaque couche de l'architecture :
-1. **`CrudResult[D, E]`** (couche [Repository](file:///home/sevtify/Projets/fast-api-project-template/app/repositories/__init__.py))
-2. **`ServiceResult[D, E]`** (couche [Service](file:///home/sevtify/Projets/fast-api-project-template/app/services/__init__.py))
-3. **`IntegrationServiceResult[D, E]`** (couche [Intégrations Externes](file:///home/sevtify/Projets/fast-api-project-template/app/integrations/__init__.py))
+1. **`CrudResult[D, E]`** (couche [Repository](../app/repositories/__init__.py))
+2. **`ServiceResult[D, E]`** (couche [Service](../app/services/__init__.py))
+3. **`IntegrationServiceResult[D, E]`** (couche [Intégrations Externes](../app/integrations/__init__.py))
 
 ---
 
 ## 2. Utilisation Standard (Erreurs par défaut : `AppError`)
 
-Dans la majorité des cas, l'erreur par défaut [AppError](file:///home/sevtify/Projets/fast-api-project-template/app/globals/businnes_error.py) est suffisante. 
+Dans la majorité des cas, l'erreur par défaut [AppError](../app/globals/businnes_error.py) est suffisante. 
 
 Pour simplifier l'écriture et améliorer la lisibilité du code, des alias de types préconfigurés avec `AppError` sont mis à disposition :
 - **`DefaultAppCrudResult[D]`** est un alias de `CrudResult[D, AppError]`

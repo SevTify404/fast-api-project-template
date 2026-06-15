@@ -73,7 +73,7 @@ Le cycle de traitement des requêtes HTTP est sécurisé par des middlewares int
 ### 3.1. Gestion des exceptions non capturées (`exception_handler_middleware.py`)
 Ce middleware intercepte toutes les exceptions Python non gérées au sein de l'application (qui remonteraient autrement sous forme d'erreurs brutes ou de réponses vides) :
 - Enregistre le traceback complet de l'erreur dans les logs via `logger.exception`.
-- Traduit et retourne une réponse JSON standardisée de statut HTTP 500 respectant le schéma [DefaultAppApiResponse](file:///home/sevtify/Projets/fast-api-project-template/app/schemas/globals/api_base_response.py) contenant l'erreur `UNKNOWN_ERROR` avec le message utilisateur : *"Une erreur interne est survenue. Veuillez réessayer plus tard."*
+- Traduit et retourne une réponse JSON standardisée de statut HTTP 500 respectant le schéma [DefaultAppApiResponse](../app/schemas/globals/api_base_response.py) contenant l'erreur `UNKNOWN_ERROR` avec le message utilisateur : *"Une erreur interne est survenue. Veuillez réessayer plus tard."*
 
 ### 3.2. Journalisation et Alerte de requêtes lentes (`request_logging_middleware.py`)
 Ce middleware trace chaque requête HTTP entrante et sortante.

@@ -12,7 +12,7 @@ Ce document détaille les règles de modélisation avec SQLAlchemy 2.0, l'usage 
 ## 1. Modélisation de Base (SQLAlchemy 2.0 Moderne)
 
 Le template utilise la base déclarative moderne avec support automatique des **dataclasses** Python (`MappedAsDataclass` et `DeclarativeBase`).
-Tous les modèles SQLAlchemy sont localisés sous [app/db/models/](file:///home/sevtify/Projets/fast-api-project-template/app/db/models) et doivent hériter à la fois de `Base` (définie dans [app/db/config.py](file:///home/sevtify/Projets/fast-api-project-template/app/db/config.py)) et de `IntegrityMapperMixin`.
+Tous les modèles SQLAlchemy sont localisés sous [app/db/models/](../app/db/models) et doivent hériter à la fois de `Base` (définie dans [app/db/config.py](../app/db/config.py)) et de `IntegrityMapperMixin`.
 
 ### 1.1. Conventions d'Écriture Obligatoires
 1. **Typage strict via `Mapped[Type]`** : Tous les attributs de table doivent être typés de manière explicite.
@@ -38,7 +38,7 @@ Tous les modèles SQLAlchemy sont localisés sous [app/db/models/](file:///home/
 
 ## 3. Traduction des Erreurs d'Intégrité via `IntegrityMapperMixin`
 
-Le mixin [IntegrityMapperMixin](file:///home/sevtify/Projets/fast-api-project-template/app/db/mixins/integrity_error_mixin.py) intercepte les violations de contraintes renvoyées par le driver de base de données asynchrone (`asyncpg`) et les transforme en messages lisibles (User Friendly).
+Le mixin [IntegrityMapperMixin](../app/db/mixins/integrity_error_mixin.py) intercepte les violations de contraintes renvoyées par le driver de base de données asynchrone (`asyncpg`) et les transforme en messages lisibles (User Friendly).
 
 ### Fonctionnement :
 1. Une contrainte BD (ex: `uq_users_username`) est violée lors d'un `commit()`.

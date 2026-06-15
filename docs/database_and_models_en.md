@@ -12,7 +12,7 @@ This document details the modeling rules with SQLAlchemy 2.0, the use of explici
 ## 1. Base Modeling (Modern SQLAlchemy 2.0)
 
 The template uses the modern declarative base with automatic support for Python **dataclasses** (`MappedAsDataclass` and `DeclarativeBase`).
-All SQLAlchemy models are located under [app/db/models/](file:///home/sevtify/Projets/fast-api-project-template/app/db/models) and must inherit from both `Base` (defined in [app/db/config.py](file:///home/sevtify/Projets/fast-api-project-template/app/db/config.py)) and `IntegrityMapperMixin`.
+All SQLAlchemy models are located under [app/db/models/](../app/db/models) and must inherit from both `Base` (defined in [app/db/config.py](../app/db/config.py)) and `IntegrityMapperMixin`.
 
 ### 1.1. Mandatory Writing Conventions
 1. **Strict typing via `Mapped[Type]`**: All table attributes must be explicitly typed.
@@ -38,7 +38,7 @@ All SQLAlchemy models are located under [app/db/models/](file:///home/sevtify/Pr
 
 ## 3. Integrity Error Translation via `IntegrityMapperMixin`
 
-The [IntegrityMapperMixin](file:///home/sevtify/Projets/fast-api-project-template/app/db/mixins/integrity_error_mixin.py) intercepts constraint violations returned by the async database driver (`asyncpg`) and transforms them into user-friendly messages.
+The [IntegrityMapperMixin](../app/db/mixins/integrity_error_mixin.py) intercepts constraint violations returned by the async database driver (`asyncpg`) and transforms them into user-friendly messages.
 
 ### Operation:
 1. A database constraint (e.g., `uq_users_username`) is violated during a `commit()`.

@@ -2,7 +2,7 @@
 
 This document explains how the application's standardized return system works and how to use it to manage both success data and errors in a type-safe manner across the **Repository**, **Service**, **Integration**, and **API** layers.
 
-The source code associated with this system is located in [app/globals/app_result.py](file:///home/sevtify/Projets/fast-api-project-template/app/globals/app_result.py).
+The source code associated with this system is located in [app/globals/app_result.py](../app/globals/app_result.py).
 
 ---
 
@@ -18,15 +18,15 @@ All internal application responses inherit from a generic base class: `GenericAp
 - **`E`** represents the type of error returned in case of **failure** (by default, `AppError`).
 
 The system provides three specialized classes for each architecture layer:
-1. **`CrudResult[D, E]`** ([Repository](file:///home/sevtify/Projets/fast-api-project-template/app/repositories/__init__.py) layer)
-2. **`ServiceResult[D, E]`** ([Service](file:///home/sevtify/Projets/fast-api-project-template/app/services/__init__.py) layer)
-3. **`IntegrationServiceResult[D, E]`** ([External Integrations](file:///home/sevtify/Projets/fast-api-project-template/app/integrations/__init__.py) layer)
+1. **`CrudResult[D, E]`** ([Repository](../app/repositories/__init__.py) layer)
+2. **`ServiceResult[D, E]`** ([Service](../app/services/__init__.py) layer)
+3. **`IntegrationServiceResult[D, E]`** ([External Integrations](../app/integrations/__init__.py) layer)
 
 ---
 
 ## 2. Standard Usage (Default Errors: `AppError`)
 
-In most cases, the default [AppError](file:///home/sevtify/Projets/fast-api-project-template/app/globals/businnes_error.py) is sufficient.
+In most cases, the default [AppError](../app/globals/businnes_error.py) is sufficient.
 
 To simplify writing and improve code readability, type aliases preconfigured with `AppError` are available:
 - **`DefaultAppCrudResult[D]`** is an alias for `CrudResult[D, AppError]`

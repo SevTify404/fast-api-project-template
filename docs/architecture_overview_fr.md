@@ -34,7 +34,7 @@ graph TD
 
 ### 2.1. Couche Présentation (Routers / API)
 - **Rôle** : Définir les routes HTTP, valider les paramètres entrants (via les schémas Pydantic) et sérialiser les sorties.
-- **Emplacement** : [app/routers/](file:///home/sevtify/Projets/fast-api-project-template/app/routers)
+- **Emplacement** : [app/routers/](../app/routers)
 - **Règles** :
   - Utilise les dépendances FastAPI (`Depends`) pour injecter les services.
   - Valide les sorties avec le paramètre `response_model` réglé sur une sous-classe explicite de `ApiBaseResponse` (pour une documentation Swagger propre).
@@ -42,7 +42,7 @@ graph TD
 
 ### 2.2. Couche Métier (Services)
 - **Rôle** : Contenir l'intelligence de l'application (validation métier, calculs, orchestration des flux).
-- **Emplacement** : [app/services/](file:///home/sevtify/Projets/fast-api-project-template/app/services)
+- **Emplacement** : [app/services/](../app/services)
 - **Règles** :
   - Reçoit ses dépendances (`db: AsyncSession`, `cache: CacheWrapper`) via son constructeur (`__init__`).
   - Instancie en interne les repositories et les classes de cache nécessaires.
@@ -50,7 +50,7 @@ graph TD
 
 ### 2.3. Couche Accès Données (Repositories)
 - **Rôle** : Traduire les requêtes de données en requêtes SQL asynchrones SQLAlchemy.
-- **Emplacement** : [app/repositories/](file:///home/sevtify/Projets/fast-api-project-template/app/repositories)
+- **Emplacement** : [app/repositories/](../app/repositories)
 - **Règles** :
   - Décoré avec `@dataclass` pour simplifier l'injection de la session BD `db: AsyncSession`.
   - Gère les exceptions de manière globale via le helper `RepositoriesUtils` (`traiter_errors_en_global` ou `traiter_exception_inconnue`).
@@ -58,7 +58,7 @@ graph TD
 
 ### 2.4. Couche Cache (Cachers)
 - **Rôle** : Offrir une interface type-safe pour stocker et invalider les entités fréquemment lues.
-- **Emplacement** : [app/cache/](file:///home/sevtify/Projets/fast-api-project-template/app/cache)
+- **Emplacement** : [app/cache/](../app/cache)
 - **Règles** :
   - Encapsule le wrapper Redis de bas niveau (`CacheWrapper`).
   - Utilise des clés de cache structurées et enregistrées centralement (`CacheKey`, `AvailableCacheKeys`, `CacheKeysFactory`).
@@ -66,7 +66,7 @@ graph TD
 ---
 
 ## 3. Cycle de vie et démarrage de l'application
-Le démarrage de l'application est orchestré dans [app/settings/app_lifespan.py](file:///home/sevtify/Projets/fast-api-project-template/app/settings/app_lifespan.py) :
-1. **uvloop** : Utilisé pour optimiser l'event loop d'asyncio sur les systèmes Unix (configuré dans [app/main.py](file:///home/sevtify/Projets/fast-api-project-template/app/main.py)). Un fallback asynchrone standard est prévu pour Windows.
+Le démarrage de l'application est orchestré dans [app/settings/app_lifespan.py](../app/settings/app_lifespan.py) :
+1. **uvloop** : Utilisé pour optimiser l'event loop d'asyncio sur les systèmes Unix (configuré dans [app/main.py](../app/main.py)). Un fallback asynchrone standard est prévu pour Windows.
 2. **Setup Logging** : Chargement de la configuration des logs.
 3. **Health Check des dépendances** : Exécution asynchrone en parallèle de `SELECT 1` sur la base de données et `ping` sur Redis (avec un timeout strict de 5 secondes) pour bloquer ou avertir si une dépendance critique est indisponible au démarrage.

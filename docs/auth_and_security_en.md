@@ -14,16 +14,16 @@ This document describes the security system, dual-cookie authentication, and rol
 To maximize security while providing a smooth user experience, the template uses two distinct securely stored client-side cookies:
 
 1. **Access Token**:
-   - **Cookie Name**: `_SECURE_TOKEN` (defined by `JWT_COOKIE_ACCESS_ID` in [app/core/config.py](file:///home/sevtify/Projets/fast-api-project-template/app/core/config.py)).
+   - **Cookie Name**: `_SECURE_TOKEN` (defined by `JWT_COOKIE_ACCESS_ID` in [app/core/config.py](../app/core/config.py)).
    - **Duration**: Short (1 hour by default).
    - **Role**: Used to authenticate each direct HTTP request. Contains the encrypted session ID (`sid`) in the payload.
 2. **Refresh Token**:
-   - **Cookie Name**: `_SID_REFRESH` (defined by `SID_REF_COOKIE` in [app/core/config.py](file:///home/sevtify/Projets/fast-api-project-template/app/core/config.py)).
+   - **Cookie Name**: `_SID_REFRESH` (defined by `SID_REF_COOKIE` in [app/core/config.py](../app/core/config.py)).
    - **Duration**: Long (7 days by default).
    - **Role**: Used only to renew the expired Access Token via the `/auth/refresh` route. Contains the session ID (`sid`) and the refresh token hash.
 
 ### 1.1. Cookie Security
-The [CookieManager](file:///home/sevtify/Projets/fast-api-project-template/app/auth/cookie_manager.py) class manages cookie deposit, reading, and deletion:
+The [CookieManager](../app/auth/cookie_manager.py) class manages cookie deposit, reading, and deletion:
 - **HttpOnly=True**: Blocks JavaScript access to cookies, preventing XSS attacks.
 - **Secure**: Forced to `True` in `PRODUCTION` environment (transmitted only via HTTPS).
 - **SameSite**: Set to `"lax"` in local development for easier debugging and `"none"` in production to allow secure cross-origin requests.
@@ -54,7 +54,7 @@ sequenceDiagram
 ```
 
 ### 2.1. Main Dependency
-To protect an endpoint and get the logged-in user, use the injected dependency `get_current_user` from [app/auth/dependencies.py](file:///home/sevtify/Projets/fast-api-project-template/app/auth/dependencies.py):
+To protect an endpoint and get the logged-in user, use the injected dependency `get_current_user` from [app/auth/dependencies.py](../app/auth/dependencies.py):
 
 ```python
 from fastapi import APIRouter, Depends
@@ -74,9 +74,9 @@ async def my_protected_endpoint(
 
 ## 3. Role-Based Access Control (RBAC)
 
-Access control relies on the [RoleChecker](file:///home/sevtify/Projets/fast-api-project-template/app/auth/role_checker.py) class, which verifies the user's role returned by `get_current_user`.
+Access control relies on the [RoleChecker](../app/auth/role_checker.py) class, which verifies the user's role returned by `get_current_user`.
 
-To avoid instantiating role checkers for each route, preconfigured dependencies are centralized in the [RoleDepends](file:///home/sevtify/Projets/fast-api-project-template/app/auth/role_depends.py) class:
+To avoid instantiating role checkers for each route, preconfigured dependencies are centralized in the [RoleDepends](../app/auth/role_depends.py) class:
 - `RoleDepends.all_authorize`: Allows users of type `ADMIN` and `USER`.
 - `RoleDepends.only_admin_authorize`: Exclusive access restriction for `ADMIN` role.
 

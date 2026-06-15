@@ -35,7 +35,7 @@ graph TD
 
 ### 2.1. Presentation Layer (Routers / API)
 - **Role**: Define HTTP routes, validate incoming parameters (via Pydantic schemas), and serialize outputs.
-- **Location**: [app/routers/](file:///home/sevtify/Projets/fast-api-project-template/app/routers)
+- **Location**: [app/routers/](../app/routers)
 - **Rules**:
   - Use FastAPI dependencies (`Depends`) to inject services.
   - Validate outputs with the `response_model` parameter set to an explicit subclass of `ApiBaseResponse` (for clean Swagger documentation).
@@ -43,7 +43,7 @@ graph TD
 
 ### 2.2. Business Layer (Services)
 - **Role**: Contain the application's intelligence (business validation, calculations, flow orchestration).
-- **Location**: [app/services/](file:///home/sevtify/Projets/fast-api-project-template/app/services)
+- **Location**: [app/services/](../app/services)
 - **Rules**:
   - Receive dependencies (`db: AsyncSession`, `cache: CacheWrapper`) via constructor (`__init__`).
   - Internally instantiate repositories and cache classes as needed.
@@ -51,7 +51,7 @@ graph TD
 
 ### 2.3. Data Access Layer (Repositories)
 - **Role**: Translate data queries into async SQLAlchemy queries.
-- **Location**: [app/repositories/](file:///home/sevtify/Projets/fast-api-project-template/app/repositories)
+- **Location**: [app/repositories/](../app/repositories)
 - **Rules**:
   - Decorated with `@dataclass` to simplify the injection of the database session `db: AsyncSession`.
   - Handle exceptions globally via the `RepositoriesUtils` helper (`traiter_errors_en_global` or `traiter_exception_inconnue`).
@@ -59,7 +59,7 @@ graph TD
 
 ### 2.4. Cache Layer (Cachers)
 - **Role**: Provide a type-safe interface for storing and invalidating frequently read entities.
-- **Location**: [app/cache/](file:///home/sevtify/Projets/fast-api-project-template/app/cache)
+- **Location**: [app/cache/](../app/cache)
 - **Rules**:
   - Encapsulate the low-level Redis wrapper (`CacheWrapper`).
   - Use structured and centrally registered cache keys (`CacheKey`, `AvailableCacheKeys`, `CacheKeysFactory`).
@@ -68,7 +68,7 @@ graph TD
 
 ## 3. Application Lifecycle and Startup
 
-The application startup is orchestrated in [app/settings/app_lifespan.py](file:///home/sevtify/Projets/fast-api-project-template/app/settings/app_lifespan.py):
-1. **uvloop**: Used to optimize the asyncio event loop on Unix systems (configured in [app/main.py](file:///home/sevtify/Projets/fast-api-project-template/app/main.py)). A standard async fallback is provided for Windows.
+The application startup is orchestrated in [app/settings/app_lifespan.py](../app/settings/app_lifespan.py):
+1. **uvloop**: Used to optimize the asyncio event loop on Unix systems (configured in [app/main.py](../app/main.py)). A standard async fallback is provided for Windows.
 2. **Setup Logging**: Loading the log configuration.
 3. **Dependency Health Check**: Async parallel execution of `SELECT 1` on the database and `ping` on Redis (with a strict 5-second timeout) to block or warn if a critical dependency is unavailable at startup.

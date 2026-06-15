@@ -15,7 +15,7 @@ The exclusive role of a Repository is to execute SQL queries and return the resu
 
 ### 1.1. Design and Dependencies
 - **`@dataclass`**: Repositories are decorated with `@dataclass` to simplify the injection of the async database session `db: AsyncSession`.
-- **Global Exception Handling**: All queries are wrapped in a `try/except` block. Errors are redirected to [RepositoriesUtils](file:///home/sevtify/Projets/fast-api-project-template/app/repositories/helpers/repositories_utils.py) to ensure:
+- **Global Exception Handling**: All queries are wrapped in a `try/except` block. Errors are redirected to [RepositoriesUtils](../app/repositories/helpers/repositories_utils.py) to ensure:
   1. Automatic rollback of the database session (`await session.rollback()`) to prevent corrupted transactional states.
   2. Automatic translation of integrity errors (via the model's `IntegrityMapperMixin`).
   3. Anonymization and logging of internal errors (HTTP 500).
