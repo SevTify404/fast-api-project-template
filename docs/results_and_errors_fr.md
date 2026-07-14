@@ -184,9 +184,23 @@ En résumé :
 - `-> ApiBaseResponse[ReadUser, AppError]` sert au typage statique Python, car c'est le type réellement retourné par `to_HTTP_api_base_response`.
 - Annoter la route avec `-> ReadUserApiResponse` provoque généralement une erreur de typage tant que le helper ne construit pas explicitement cette sous-classe.
 
+## 5. Standardisation des exceptions globales (401, 403, 422)
+
+Pour garantir une API prévisible et unifiée, les exceptions levées automatiquement par FastAPI ou Starlette sont interceptées par des gestionnaires d'exceptions personnalisés enregistrés sur l'application :
+
+1. **Erreurs de validation de schéma (422 - `RequestValidationError`)** : 
+   - Interceptées par `validation_exception_handler`.
+   - Elles retournent une réponse JSON standardisée avec `error_type` égal à `AppErrorType.VALIDATION_ERROR` et un message `error_message` contenant la liste formatée des champs erronés (ex: `"Erreur de validation: Champ 'username': ...; Champ 'password': ..."`).
+2. **HTTPExceptions (401, 403, 404, etc. - `StarletteHTTPException`)** :
+   - Interceptées par `http_exception_handler`.
+   - Si le paramètre `detail` de l'exception contient déjà un objet `AppError`, celui-ci est directement renvoyé.
+   - Sinon, il est automatiquement converti en `AppError` avec un `error_type` correspondant (ex: `UNAUTHORIZED` pour 401, `FORBIDDEN` pour 403) et le message d'erreur d'origine.
+
+Grâce à ce mécanisme, le client reçoit toujours le même format de réponse JSON, que l'erreur provienne d'une exception levée par le framework ou d'une erreur métier gérée manuellement.
+
 ---
 
-## 5. Bonnes Pratiques & Anti-patterns
+## 6. Bonnes Pratiques & Anti-patterns
 
 > [!TIP]
 > - **Utilisez toujours les helpers de classe** (`crud_success`, `service_failure`, etc.) au lieu d'instancier les classes directement via `__init__`.
