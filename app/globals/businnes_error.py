@@ -9,6 +9,8 @@ class AppErrorType(str, Enum):
     UNKNOWN_ERROR = "UNKNOWN_ERROR"
     BAD_REQUEST = "BAD_REQUEST"
     UNAUTHORIZED = "UNAUTHORIZED"
+    FORBIDDEN = "FORBIDDEN"
+    VALIDATION_ERROR = "VALIDATION_ERROR"
 
 
 class AppError(BaseModel):

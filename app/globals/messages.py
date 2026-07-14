@@ -11,6 +11,7 @@ class Messages:
     UNAUTHORIZED = "Non autorisé. Veuillez vous connecter."
     FORBIDDEN = "Accès interdit. Vous n'avez pas les permissions nécessaires."
     BAD_REQUEST = "Requête invalide. Veuillez vérifier les données envoyées."
+    VALIDATION_ERROR = "Erreur de validation des données."
 
     # Messages spécifiques
     USER_NOT_FOUND = "Utilisateur non trouvé."

@@ -184,9 +184,23 @@ In summary:
 - `-> ApiBaseResponse[ReadUser, AppError]` serves Python static typing, as it is the type actually returned by `to_HTTP_api_base_response`.
 - Annotating the route with `-> ReadUserApiResponse` generally causes a typing error as long as the helper does not explicitly build this subclass.
 
+## 5. Standardization of Global Exceptions (401, 403, 422)
+
+To ensure a predictable and unified API, exceptions raised automatically by FastAPI or Starlette are intercepted by custom exception handlers registered on the application:
+
+1. **Schema Validation Errors (422 - `RequestValidationError`)**: 
+   - Intercepted by `validation_exception_handler`.
+   - They return a standardized JSON response with `error_type` set to `AppErrorType.VALIDATION_ERROR` and an `error_message` containing the formatted list of erroneous fields (e.g., `"Erreur de validation: Champ 'username': ...; Champ 'password': ..."`).
+2. **HTTPExceptions (401, 403, 404, etc. - `StarletteHTTPException`)**:
+   - Intercepted by `http_exception_handler`.
+   - If the exception's `detail` parameter is already an `AppError` object, it is directly returned.
+   - Otherwise, it is automatically converted into `AppError` with a corresponding `error_type` (e.g., `UNAUTHORIZED` for 401, `FORBIDDEN` for 403) and the original error message.
+
+With this mechanism, the client always receives the exact same JSON response format, whether the error comes from an exception raised by the framework or a manually handled business error.
+
 ---
 
-## 5. Best Practices & Anti-patterns
+## 6. Best Practices & Anti-patterns
 
 > [!TIP]
 > - **Always use class helpers** (`crud_success`, `service_failure`, etc.) instead of directly instantiating classes via `__init__`.
